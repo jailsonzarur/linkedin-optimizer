@@ -3,32 +3,42 @@
 An open-source platform to analyze and optimize a LinkedIn profile,
 helping tech professionals get found by more recruiters.
 
-A user submits their profile (PDF export or pasted text). The platform
-parses it, runs it through an LLM-based analysis pipeline, and returns a
-structured breakdown — completeness, headline strength, About section
-quality, experience bullets — plus a rewritten version of the weak spots.
-A planned gap-analysis stage compares the profile's vocabulary against a
-corpus of real job postings for the user's target role, to surface
-missing keywords a recruiter's search would otherwise filter out on.
+The platform is built around three pieces of context, combined at
+analysis time:
+
+1. **A knowledge base per user** — experiences, skills, and achievements
+   captured from audio, pasted text, or an uploaded résumé, indexed for
+   semantic retrieval rather than forced into a rigid résumé schema.
+2. **A corpus of real job postings** for common tech roles, kept fresh on
+   a recurring schedule so gap analysis has current market signal to
+   compare against.
+3. **The user's actual LinkedIn profile**, pulled in at analysis time and
+   scored section by section.
+
+Combining the three, the platform generates a rewritten headline, About
+section, and experience bullets — grounded strictly in what the user's
+own knowledge base supports, never inventing skills or experience, just
+restructuring for how recruiters actually search.
 
 ## Status
 
-Early scaffold stage. The Django project, async task infrastructure, and
-local dev environment are wired up and working end to end. No domain
-models, parsing logic, or analysis pipeline exist yet — those come after
-the feature set is fully scoped, so the data model is designed once
-instead of migrated repeatedly.
+Data model in place across all four apps (`accounts`, `knowledge`,
+`jobs`, `analysis`) and migrated end to end, including `pgvector`
+embedding columns. No ingestion pipeline, parsing logic, job-scraping
+task, or LLM analysis pipeline exist yet — those are next.
 
 ## Stack
 
 - **Django 6**, server-rendered templates + [HTMX](https://htmx.org/) +
   [Alpine.js](https://alpinejs.dev/) — no separate frontend build
 - **PostgreSQL 16** with [`pgvector`](https://github.com/pgvector/pgvector)
-  — relational data now, embeddings for the job-postings RAG corpus later
+  — relational data alongside embedding columns for semantic retrieval
+  over the user's knowledge base and the job-postings corpus
 - **Celery + Redis** — the analysis pipeline runs as a background job,
   not inline in the request/response cycle
-- **[Anthropic API](https://docs.anthropic.com/)** for the analysis and
-  rewrite generation
+- **[OpenAI API](https://platform.openai.com/docs/)** — an LLM for
+  analysis and rewrite generation, `text-embedding-3-small` (1536
+  dimensions) for embeddings
 - **[`uv`](https://docs.astral.sh/uv/)** for dependency management
 
 ## Local setup
@@ -69,6 +79,12 @@ config/
     prod.py   # security hardening (HSTS, secure cookies, SSL redirect)
   celery.py   # Celery app definition
   urls.py
+accounts/     # IdentityVariation — LLM-derived "who this person is",
+              # embedded for semantic job-posting retrieval
+knowledge/    # KnowledgeSource, KnowledgeChunk — the per-user knowledge base
+jobs/         # TargetRoleCatalog, JobPosting — the job-postings corpus
+analysis/     # ProfileSnapshot, Analysis, AnalysisSection — the analysis
+              # and rewrite output
 templates/    # project-wide Django templates
 static/       # project-wide static assets
 ```
@@ -79,11 +95,14 @@ explicit at the file level.
 
 ## Roadmap
 
-- [ ] Domain models: profile, experience, education, skills
-- [ ] PDF / pasted-text parser into the normalized profile schema
-- [ ] LLM-based analysis pipeline (completeness, headline, About,
+- [x] Data model across all four apps, migrated with `pgvector` support
+- [ ] Knowledge base ingestion: audio transcription, résumé parsing,
+      pasted text → `KnowledgeChunk` extraction
+- [ ] `IdentityVariation` generation from headline + knowledge base
+- [ ] Job-postings scraper + recurring Celery Beat schedule
+- [ ] Semantic retrieval of relevant job postings per user (gap analysis)
+- [ ] LLM-based profile analysis pipeline (completeness, headline, About,
       experience bullets) running via Celery
-- [ ] Job-postings corpus + keyword gap analysis (RAG over `pgvector`)
 - [ ] Rewrite suggestions with before/after diff
 - [ ] Web UI (Django templates + HTMX)
 

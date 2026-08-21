@@ -22,7 +22,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_htmx",
-    # project apps go here as they're created
+    "accounts",
+    "knowledge",
+    "jobs",
+    "analysis",
 ]
 
 MIDDLEWARE = [
@@ -86,5 +89,5 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
-# --- Anthropic ---
-ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY", default="")
+# --- OpenAI ---
+OPENAI_API_KEY = env("OPENAI_API_KEY", default="")
