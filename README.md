@@ -89,4 +89,4 @@ explicit at the file level.
 
 ## License
 
-TBD.
+[MIT](LICENSE)
