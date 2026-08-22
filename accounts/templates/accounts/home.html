@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Início · LinkedIn Optimizer{% endblock %}
+
+{% block content %}
+<div class="shell stack gap-6" style="padding-top: var(--sp-6); padding-bottom: var(--sp-7);">
+
+  <div class="stack gap-1">
+    <h1 class="t-xl">Olá, {{ request.user.get_short_name|default:request.user.get_username }}</h1>
+    <p class="t-sm muted">Esta home ainda é um esboço — as áreas abaixo entram conforme cada fase fica pronta.</p>
+  </div>
+
+  <div class="panes">
+    {% if latest_analysis %}
+      <a class="tile tile--live" href="{% url 'analysis:result' latest_analysis.pk %}" style="color: var(--text);">
+        <span class="row spread gap-3">
+          <span class="t-lg">Sua última análise</span>
+          {% include "components/_pill.html" with text="pronta" tone="accent" %}
+        </span>
+        <span class="t-sm muted">
+          Score {{ latest_analysis.overall_score }}/100 · {{ latest_analysis.created_at|date:"j M Y" }}
+        </span>
+      </a>
+    {% else %}
+      <div class="tile">
+        <span class="t-lg">Nenhuma análise ainda</span>
+        <span class="t-sm dim">Quando o pipeline existir, sua primeira análise aparece aqui.</span>
+      </div>
+    {% endif %}
+
+    <div class="tile">
+      <span class="row spread gap-3">
+        <span class="t-lg">Base de conhecimento</span>
+        {% include "components/_pill.html" with text="em breve" %}
+      </span>
+      <span class="t-sm dim">Áudios, currículo e texto livre que ensinam a plataforma sobre você.</span>
+    </div>
+  </div>
+
+  <div class="panes">
+    <div class="tile">
+      <span class="row spread gap-3">
+        <span class="t-lg">Vagas do seu cargo</span>
+        {% include "components/_pill.html" with text="em breve" %}
+      </span>
+      <span class="t-sm dim">O corpus que alimenta o gap de keywords.</span>
+    </div>
+
+    <div class="tile">
+      <span class="row spread gap-3">
+        <span class="t-lg">Histórico</span>
+        {% include "components/_pill.html" with text="em breve" %}
+      </span>
+      <span class="t-sm dim">Evolução do seu score ao longo do tempo.</span>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

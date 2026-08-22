@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from analysis.models import Analysis, AnalysisSection, ProfileSnapshot
@@ -49,13 +49,31 @@ KEYWORD_GAP = [
 class Command(BaseCommand):
     help = "Seed a demo Analysis for developing the result screen."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--username",
+            default="rafael.demo",
+            help="Attach the demo analysis to this account instead of the default demo user.",
+        )
+
     @transaction.atomic
     def handle(self, *args, **options):
         User = get_user_model()
-        user, _ = User.objects.get_or_create(
-            username="rafael.demo",
-            defaults={"first_name": "Rafael", "last_name": "Moreira", "email": "rafael@example.com"},
-        )
+        username = options["username"]
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            if username != "rafael.demo":
+                raise CommandError(
+                    f"No account named {username!r}. Create it through the signup page first."
+                )
+            user = User.objects.create(
+                username=username,
+                first_name="Rafael",
+                last_name="Moreira",
+                email="rafael@example.com",
+            )
 
         snapshot = ProfileSnapshot.objects.create(
             user=user,
@@ -102,4 +120,4 @@ class Command(BaseCommand):
                 variant_index=0,
             )
 
-        self.stdout.write(self.style.SUCCESS(f"Analysis #{analysis.pk} created at /analise/{analysis.pk}/"))
+        self.stdout.write(self.style.SUCCESS(f"Analysis #{analysis.pk} created for {user.username} at /analise/{analysis.pk}/"))

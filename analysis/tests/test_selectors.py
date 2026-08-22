@@ -8,7 +8,8 @@ from analysis.selectors.result import AnalysisResultSelector
 class AnalysisResultSelectorTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        user = get_user_model().objects.create_user(username="tester")
+        cls.user = get_user_model().objects.create_user(username="tester")
+        user = cls.user
         snapshot = ProfileSnapshot.objects.create(user=user, raw_content="perfil")
         cls.analysis = Analysis.objects.create(
             user=user,
@@ -44,7 +45,7 @@ class AnalysisResultSelectorTests(TestCase):
         )
 
     def selector(self):
-        return AnalysisResultSelector.for_pk(self.analysis.pk)
+        return AnalysisResultSelector.for_user(self.user, self.analysis.pk)
 
     def test_only_primary_variant_becomes_a_row(self):
         groups = {group["key"]: group for group in self.selector().groups()}
@@ -73,4 +74,9 @@ class AnalysisResultSelectorTests(TestCase):
 
     def test_missing_analysis_raises(self):
         with self.assertRaises(Analysis.DoesNotExist):
-            AnalysisResultSelector.for_pk(99999)
+            AnalysisResultSelector.for_user(self.user, 99999)
+
+    def test_another_users_analysis_is_not_reachable(self):
+        intruder = get_user_model().objects.create_user(username="intruder")
+        with self.assertRaises(Analysis.DoesNotExist):
+            AnalysisResultSelector.for_user(intruder, self.analysis.pk)

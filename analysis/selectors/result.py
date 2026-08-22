@@ -16,9 +16,11 @@ class AnalysisResultSelector:
         self.sections = list(analysis.sections.all())
 
     @classmethod
-    def for_pk(cls, pk):
+    def for_user(cls, user, pk):
         analysis = (
-            Analysis.objects.select_related("user").prefetch_related("sections").get(pk=pk)
+            Analysis.objects.select_related("user")
+            .prefetch_related("sections")
+            .get(pk=pk, user=user)
         )
         return cls(analysis)
 

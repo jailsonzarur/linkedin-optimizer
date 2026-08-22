@@ -104,6 +104,55 @@
 }
 .section-rule { flex-grow: 1; height: 1px; background: var(--border-soft); }
 
+/* ============ auth layout ============ */
+.auth { min-height: 100dvh; display: grid; place-items: center; padding: var(--sp-5); }
+.auth__card { width: 100%; max-width: 396px; }
+.auth__brand {
+  display: flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  font-weight: 600; letter-spacing: -0.02em; margin-bottom: var(--sp-5);
+}
+.auth__title { text-align: center; }
+.auth__foot {
+  text-align: center; margin-top: var(--sp-5); padding-top: var(--sp-4);
+  border-top: 1px solid var(--border-soft); font-size: var(--text-sm); color: var(--text-muted);
+}
+
+/* ============ form ============ */
+.field { display: flex; flex-direction: column; gap: var(--sp-2); }
+.field__label { font-size: var(--text-sm); color: var(--text-muted); }
+
+.input {
+  width: 100%; height: var(--control-h); padding: 0 var(--sp-3);
+  border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--surface-sunken); color: var(--text);
+  font-family: var(--font-ui); font-size: var(--text-md);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.input::placeholder { color: var(--text-dim); }
+.input:hover { border-color: var(--border-strong); }
+.input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.field--invalid .input { border-color: var(--danger); }
+
+.field__error { font-size: var(--text-xs); color: var(--danger); }
+.field__help  { font-size: var(--text-xs); color: var(--text-dim); line-height: 1.5; }
+
+.alert {
+  display: flex; align-items: flex-start; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--radius);
+  border: 1px solid var(--danger); background: var(--danger-wash);
+  color: var(--danger); font-size: var(--text-sm); line-height: 1.5;
+}
+
+.btn--block { width: 100%; }
+
+/* ============ placeholder tile (mocked areas) ============ */
+.tile {
+  display: flex; flex-direction: column; gap: var(--sp-2);
+  padding: var(--sp-5); border-radius: var(--radius-lg);
+  border: 1px dashed var(--border); background: var(--surface-sunken);
+}
+.tile--live { border-style: solid; background: var(--surface); }
+
 /* ============ responsive ============ */
 @media (max-width: 860px) {
   .panes { grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }

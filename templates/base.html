@@ -19,7 +19,7 @@
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-  {% include "components/_topbar.html" %}
+  {% block chrome %}{% include "components/_topbar.html" %}{% endblock %}
 
   <main>
     {% block content %}{% endblock %}
