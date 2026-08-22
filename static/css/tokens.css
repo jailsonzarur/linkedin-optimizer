@@ -1,0 +1,66 @@
+/*
+ * Design tokens. Every color, size and timing in the app resolves here —
+ * components never hardcode a literal value.
+ */
+:root {
+  /* ---- surface ramp: midnight, cool-toned, low saturation ---- */
+  --bg:            oklch(0.17 0.018 250);
+  --surface:       oklch(0.21 0.020 250);
+  --surface-raised:oklch(0.25 0.022 250);
+  --surface-sunken:oklch(0.15 0.016 250);
+
+  /* ---- lines ---- */
+  --border:        oklch(0.31 0.022 250);
+  --border-soft:   oklch(0.26 0.020 250);
+  --border-strong: oklch(0.40 0.026 250);
+
+  /* ---- text ---- */
+  --text:          oklch(0.93 0.010 250);
+  --text-muted:    oklch(0.72 0.018 250);
+  --text-dim:      oklch(0.58 0.020 250);
+
+  /* ---- accents: same lightness + chroma, hue varies ---- */
+  --accent:        oklch(0.84 0.145 155);  /* soft neon green — the "optimized" signal */
+  --warn:          oklch(0.84 0.145 75);   /* amber — attention, gaps */
+  --danger:        oklch(0.84 0.145 22);   /* rose — removed / weak */
+
+  --accent-dim:    oklch(0.62 0.110 155);
+  --accent-wash:   oklch(0.84 0.145 155 / 0.10);
+  --warn-wash:     oklch(0.84 0.145 75 / 0.10);
+  --danger-wash:   oklch(0.84 0.145 22 / 0.10);
+
+  /* ---- type ---- */
+  --font-ui:   "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --text-xs:  0.75rem;
+  --text-sm:  0.8125rem;
+  --text-md:  0.9375rem;
+  --text-lg:  1.0625rem;
+  --text-xl:  1.375rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 3rem;
+
+  /* ---- spacing scale ---- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+
+  /* ---- shape ---- */
+  --radius-sm: 4px;
+  --radius:    7px;
+  --radius-lg: 11px;
+  --radius-pill: 999px;
+
+  /* ---- motion ---- */
+  --ease: cubic-bezier(0.2, 0, 0.13, 1);
+  --dur:  150ms;
+
+  /* ---- layout ---- */
+  --shell-max: 1240px;
+  --control-h: 34px;
+}

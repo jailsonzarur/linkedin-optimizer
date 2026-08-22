@@ -1,0 +1,63 @@
+/* Reset + document-level typography. No component styles live here. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 600; line-height: 1.25; letter-spacing: -0.015em; }
+p { margin: 0; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-dim); text-decoration: underline; }
+
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Alpine: hide elements bound to state until Alpine boots, to avoid a flash. */
+[x-cloak] { display: none !important; }
+
+/* Numeric data reads as mono and stays column-aligned. */
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ---- layout primitives ---- */
+.shell { max-width: var(--shell-max); margin: 0 auto; padding: 0 var(--sp-5); }
+
+.stack { display: flex; flex-direction: column; }
+.row   { display: flex; flex-direction: row; align-items: center; }
+.grow  { flex-grow: 1; }
+.spread { justify-content: space-between; }
+
+.gap-1 { gap: var(--sp-1); } .gap-2 { gap: var(--sp-2); }
+.gap-3 { gap: var(--sp-3); } .gap-4 { gap: var(--sp-4); }
+.gap-5 { gap: var(--sp-5); } .gap-6 { gap: var(--sp-6); }
+
+/* ---- text utilities ---- */
+.t-xs { font-size: var(--text-xs); }  .t-sm { font-size: var(--text-sm); }
+.t-lg { font-size: var(--text-lg); }  .t-xl { font-size: var(--text-xl); }
+.t-2xl { font-size: var(--text-2xl); }
+.muted { color: var(--text-muted); }
+.dim   { color: var(--text-dim); }
+.t-accent { color: var(--accent); }
+.t-warn   { color: var(--warn); }
+.t-danger { color: var(--danger); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

@@ -1,0 +1,52 @@
+{% comment %}
+One section of the split-pane diff (Headline, Sobre, Experiência).
+
+Params:
+  group  dict built by analysis.views._build_groups
+
+Reads `onlyChanges` from the Alpine scope of the enclosing page to hide
+untouched rows when the user filters down to just the changes.
+{% endcomment %}
+<section class="stack gap-3">
+
+  <div class="section-head">
+    <h2 class="t-lg">{{ group.label }}</h2>
+    {% if group.changed_count %}
+      {% if group.total > 1 %}
+        {% include "components/_pill.html" with text=group.changed_summary tone=group.tone %}
+      {% else %}
+        {% include "components/_pill.html" with text="reescrito" tone=group.tone %}
+      {% endif %}
+    {% endif %}
+    <div class="section-rule"></div>
+    {% if group.alternates %}
+      <span class="t-xs dim">{{ group.alternates }} variação{{ group.alternates|pluralize:"es" }} alternativa{{ group.alternates|pluralize:"s" }}</span>
+    {% endif %}
+  </div>
+
+  {% for row in group.rows %}
+    <div class="panes"{% if not row.changed %} x-show="!onlyChanges" x-cloak{% endif %}>
+
+      <div class="diff-block diff-block--current{% if not row.changed %} diff-block--unchanged{% endif %}">
+        {{ row.left }}
+      </div>
+
+      <div class="diff-block{% if row.changed %} diff-block--optimized{% else %} diff-block--unchanged{% endif %}"
+           x-data="{ copied: false }">
+        <div x-ref="text">{{ row.right }}</div>
+        {% if row.changed %}
+          <div class="row gap-2" style="margin-top: var(--sp-3);">
+            <button type="button" class="btn btn--ghost btn--sm"
+                    @click="navigator.clipboard.writeText($refs.text.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)">
+              {% include "components/_icon.html" with name="copy" size=13 %}
+              <span x-show="!copied">Copiar</span>
+              <span x-show="copied" x-cloak class="t-accent">Copiado</span>
+            </button>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  {% endfor %}
+
+</section>

@@ -1,0 +1,16 @@
+{% comment %}
+Global app header. No parameters — it reads request.user directly.
+{% endcomment %}
+<header class="topbar">
+  <div class="shell topbar__inner">
+    <a class="topbar__brand" href="/" style="color: var(--text);">
+      {% include "components/_logo.html" %}
+      <span>LinkedIn Optimizer</span>
+    </a>
+    <nav class="topbar__nav">
+      <a class="topbar__link" href="#">Base de conhecimento</a>
+      <a class="topbar__link" href="#">Histórico</a>
+      <div class="topbar__avatar" title="{{ request.user.get_username|default:'Visitante' }}"></div>
+    </nav>
+  </div>
+</header>

@@ -15,5 +15,6 @@ db.sqlite3
 staticfiles/
 media/
 
-# Editor
+# Editor / tooling
 .DS_Store
+.claude/

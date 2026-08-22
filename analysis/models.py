@@ -29,6 +29,7 @@ class Analysis(models.Model):
     profile_snapshot = models.ForeignKey(ProfileSnapshot, on_delete=models.CASCADE, related_name="analyses")
     overall_score = models.PositiveSmallIntegerField(null=True, blank=True)
     overall_score_per_section = models.JSONField(default=dict)
+    keyword_gap = models.JSONField(default=list)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
 

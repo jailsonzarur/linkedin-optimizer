@@ -1,0 +1,17 @@
+{% comment %}
+Button / link button, for the plain case (no HTMX attributes).
+When you need hx-* attributes, write the element inline with class="btn ..." —
+Django includes can't forward arbitrary attributes.
+
+Params:
+  label   (required)
+  variant primary | ghost | "" (default)
+  size    sm | ""
+  icon    optional icon name from _icon.html
+  href    if present, renders an <a> instead of a <button>
+{% endcomment %}
+{% if href %}<a href="{{ href }}"{% else %}<button type="button"{% endif %}
+   class="btn{% if variant %} btn--{{ variant }}{% endif %}{% if size %} btn--{{ size }}{% endif %}">
+  {% if icon %}{% include "components/_icon.html" with name=icon size=14 %}{% endif %}
+  <span>{{ label }}</span>
+{% if href %}</a>{% else %}</button>{% endif %}

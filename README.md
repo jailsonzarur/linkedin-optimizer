@@ -71,27 +71,79 @@ uv run celery -A config worker -l info
 
 ## Project structure
 
+Each Django app is one feature domain. Inside an app, code is layered — the
+layer a file lives in tells you what it is allowed to do:
+
+```
+analysis/                      # one feature domain
+  models.py                    # fields, Meta, __str__, validation — nothing heavy
+  urls.py
+  admin.py
+
+  selectors/                   # READS: queries that build what a view renders
+    result.py                  #   get_result_context(pk)
+
+  services/                    # WRITES + business rules
+    diffing.py                 #   inline_diff()
+    scoring.py                 #   score_tone()
+
+  views/                       # thin: call a selector/service, return a response
+    result.py
+
+  templates/analysis/          # templates belong to the app that renders them
+  management/commands/
+  tests/
+```
+
+Project-level directories hold only what is genuinely shared:
+
 ```
 config/
   settings/
     base.py   # shared settings, loads .env via django-environ
     dev.py    # DEBUG=True, local-only additions
     prod.py   # security hardening (HSTS, secure cookies, SSL redirect)
-  celery.py   # Celery app definition
+  celery.py
   urls.py
-accounts/     # IdentityVariation — LLM-derived "who this person is",
-              # embedded for semantic job-posting retrieval
-knowledge/    # KnowledgeSource, KnowledgeChunk — the per-user knowledge base
-jobs/         # TargetRoleCatalog, JobPosting — the job-postings corpus
-analysis/     # ProfileSnapshot, Analysis, AnalysisSection — the analysis
-              # and rewrite output
-templates/    # project-wide Django templates
-static/       # project-wide static assets
+templates/
+  base.html
+  components/   # reusable UI partials (_btn, _icon, _meter, _pill, _topbar)
+static/css/     # design system: tokens.css, base.css, components.css
 ```
 
-Settings are split by environment (`dev.py` / `prod.py`) instead of
-branching on `DEBUG` inside a single file, so environment differences are
-explicit at the file level.
+### The rules
+
+1. **Selectors read, services write.** Every query a view needs is a selector;
+   every operation that changes state or applies a domain rule is a service.
+   "Where does this function go?" always has one of those two answers.
+2. **Views stay thin.** Receive the request, call a selector or service, render.
+   A business-rule `if` inside a view belongs in a service.
+3. **Models stay thin.** Fields, `Meta`, `__str__`, `clean()`. No fat query
+   methods — those are selectors.
+4. **Flat until it hurts.** `models.py` stays a single module while it is small;
+   it becomes a `models/` package when it passes roughly 200 lines. Do not
+   create a package for one file.
+
+Settings are split by environment (`dev.py` / `prod.py`) instead of branching on
+`DEBUG` inside a single file, so environment differences are explicit at the
+file level.
+
+## Tests
+
+```bash
+uv run python manage.py test
+```
+
+## Development data
+
+The ingestion pipeline does not exist yet, so a management command seeds one
+fully-populated analysis to develop the result screen against:
+
+```bash
+uv run python manage.py seed_demo
+```
+
+It prints the URL of the analysis it created.
 
 ## Roadmap
 

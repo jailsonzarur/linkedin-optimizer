@@ -1,0 +1,20 @@
+{% comment %}
+Labelled progress bar. Used for section scores and keyword coverage.
+
+Params:
+  label  (required)
+  value  0-100 integer, drives the fill width
+  tone   accent | warn | danger | "" (neutral, default)
+  note   optional right-hand text; falls back to "{value}%"
+Usage:
+  {% include "components/_meter.html" with label="Docker" value=87 tone="danger" note="87% das vagas · ausente" %}
+{% endcomment %}
+<div class="meter">
+  <div class="meter__head">
+    <span>{{ label }}</span>
+    <span class="num{% if tone %} t-{{ tone }}{% else %} muted{% endif %}">{{ note|default:value }}{% if not note %}%{% endif %}</span>
+  </div>
+  <div class="meter__track" role="progressbar" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100" aria-label="{{ label }}">
+    <div class="meter__fill{% if tone %} meter__fill--{{ tone }}{% endif %}" style="width: {{ value }}%"></div>
+  </div>
+</div>

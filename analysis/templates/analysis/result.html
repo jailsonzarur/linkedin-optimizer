@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Resultado da análise · LinkedIn Optimizer{% endblock %}
+
+{% block content %}
+<div class="shell stack gap-5" style="padding-top: var(--sp-6); padding-bottom: var(--sp-7);"
+     x-data="{ onlyChanges: false, copiedAll: false }">
+
+  {# ---------- page header ---------- #}
+  <div class="row spread gap-4" style="flex-wrap: wrap; align-items: flex-end;">
+    <div class="stack gap-1">
+      <h1 class="t-xl">Perfil otimizado</h1>
+      <p class="t-sm muted">
+        {{ analysis.user.get_full_name|default:analysis.user.get_username }}
+        · analisado em {{ analysis.created_at|date:"j M Y" }}
+      </p>
+    </div>
+
+    <div class="row gap-2">
+      <button type="button" class="btn btn--sm"
+              :class="onlyChanges ? 'btn--primary' : ''"
+              @click="onlyChanges = !onlyChanges"
+              :aria-pressed="onlyChanges">
+        {% include "components/_icon.html" with name="filter" size=14 %}
+        <span x-text="onlyChanges ? 'Mostrando só mudanças' : 'Ver só mudanças'">Ver só mudanças</span>
+      </button>
+
+      <button type="button" class="btn btn--primary"
+              @click="navigator.clipboard.writeText($refs.fullText.innerText.trim()); copiedAll = true; setTimeout(() => copiedAll = false, 1800)">
+        {% include "components/_icon.html" with name="copy" size=14 %}
+        <span x-show="!copiedAll">Copiar tudo</span>
+        <span x-show="copiedAll" x-cloak>Copiado</span>
+      </button>
+    </div>
+  </div>
+
+  {# hidden source for "Copiar tudo" #}
+  <div x-ref="fullText" hidden>{% for group in groups %}{{ group.label }}
+{% for row in group.rows %}{{ row.suggested }}
+{% endfor %}
+{% endfor %}</div>
+
+  {# ---------- column labels ---------- #}
+  <div class="panes panes--labels">
+    <div class="pane-head pane-head--current">
+      {% include "components/_icon.html" with name="circle" size=14 %}
+      <span>Perfil atual</span>
+    </div>
+    <div class="pane-head pane-head--optimized">
+      {% include "components/_icon.html" with name="check" size=14 %}
+      <span>Versão otimizada</span>
+    </div>
+  </div>
+
+  {# ---------- the diff itself ---------- #}
+  <div class="stack gap-6">
+    {% for group in groups %}
+      {% include "analysis/partials/_diff_section.html" %}
+    {% empty %}
+      <div class="card"><div class="card__body muted">Esta análise ainda não gerou sugestões.</div></div>
+    {% endfor %}
+  </div>
+
+  {# ---------- secondary: score + keyword gap ---------- #}
+  <div class="stack gap-3" style="margin-top: var(--sp-3);">
+
+    <div class="disclosure" x-data="{ open: false }">
+      <button type="button" class="disclosure__trigger" @click="open = !open" :aria-expanded="open">
+        <span class="disclosure__label">
+          <span class="disclosure__chevron" :data-open="open" style="display: inline-flex;">
+            {% include "components/_icon.html" with name="chevron" size=14 %}
+          </span>
+          <span>Score da análise</span>
+          <span class="num t-sm {% if overall_tone %}t-{{ overall_tone }}{% else %}muted{% endif %}">{{ analysis.overall_score }}/100</span>
+        </span>
+        <span class="t-xs dim" x-text="open ? 'ocultar' : 'ver detalhes'">ver detalhes</span>
+      </button>
+
+      <div class="disclosure__panel" x-show="open" x-cloak x-transition.opacity>
+        <div class="stack gap-4">
+          {% for score in section_scores %}
+            {% include "components/_meter.html" with label=score.label value=score.value tone=score.tone %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="disclosure" x-data="{ open: false }">
+      <button type="button" class="disclosure__trigger" @click="open = !open" :aria-expanded="open">
+        <span class="disclosure__label">
+          <span class="disclosure__chevron" :data-open="open" style="display: inline-flex;">
+            {% include "components/_icon.html" with name="chevron" size=14 %}
+          </span>
+          <span>Gap de keywords</span>
+          <span class="t-sm muted">{{ keyword_missing_count }} termo{{ keyword_missing_count|pluralize }} ausente{{ keyword_missing_count|pluralize }}</span>
+        </span>
+        <span class="t-xs dim" x-text="open ? 'ocultar' : 'ver detalhes'">ver detalhes</span>
+      </button>
+
+      <div class="disclosure__panel" x-show="open" x-cloak x-transition.opacity>
+        <div class="stack gap-4">
+          {% for kw in keyword_rows %}
+            {% include "components/_meter.html" with label=kw.term value=kw.coverage tone=kw.tone note=kw.note %}
+          {% endfor %}
+
+          {% if unsupported_terms %}
+            <div class="row gap-3" style="align-items: flex-start; padding-top: var(--sp-3); border-top: 1px solid var(--border-soft);">
+              <span class="t-warn" style="flex-shrink: 0; display: inline-flex; padding-top: 2px;">
+                {% include "components/_icon.html" with name="alert" size=15 %}
+              </span>
+              <p class="t-sm muted">
+                Sua base de conhecimento não sustenta {{ unsupported_terms }}. Confirme antes de adicionar —
+                o objetivo é reestruturar o que você já tem, nunca inventar experiência.
+              </p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
