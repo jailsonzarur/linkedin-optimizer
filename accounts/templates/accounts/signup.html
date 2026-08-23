@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Criar conta · LinkedIn Optimizer{% endblock %}
+{% block title %}Create account · LinkedIn Optimizer{% endblock %}
 {% block chrome %}{% endblock %}
 
 {% block content %}
@@ -16,8 +16,8 @@
       <div class="card__body stack gap-5">
 
         <div class="stack gap-1 auth__title">
-          <h1 class="t-lg">Criar sua conta</h1>
-          <p class="t-sm muted">Leva menos de um minuto.</p>
+          <h1 class="t-lg">Create your account</h1>
+          <p class="t-sm muted">Takes less than a minute.</p>
         </div>
 
         {% if form.non_field_errors %}
@@ -31,15 +31,15 @@
 
         <form method="post" class="stack gap-4">
           {% csrf_token %}
-          {% include "components/_field.html" with field=form.username help="Letras, números e @ . + - _" %}
+          {% include "components/_field.html" with field=form.username help="Letters, digits and @ . + - _" %}
           {% include "components/_field.html" with field=form.email no_help=True %}
-          {% include "components/_field.html" with field=form.password1 help="Pelo menos 8 caracteres. Evite senhas óbvias ou só números." %}
+          {% include "components/_field.html" with field=form.password1 help="At least 8 characters. Avoid obvious or all-numeric passwords." %}
           {% include "components/_field.html" with field=form.password2 no_help=True %}
-          <button type="submit" class="btn btn--primary btn--block">Criar conta</button>
+          <button type="submit" class="btn btn--primary btn--block">Create account</button>
         </form>
 
         <p class="auth__foot">
-          Já tem uma conta? <a href="{% url 'accounts:login' %}">Entrar</a>
+          Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a>
         </p>
 
       </div>

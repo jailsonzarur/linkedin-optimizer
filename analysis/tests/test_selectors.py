@@ -10,7 +10,7 @@ class AnalysisResultSelectorTests(TestCase):
     def setUpTestData(cls):
         cls.user = get_user_model().objects.create_user(username="tester")
         user = cls.user
-        snapshot = ProfileSnapshot.objects.create(user=user, raw_content="perfil")
+        snapshot = ProfileSnapshot.objects.create(user=user, raw_content="profile")
         cls.analysis = Analysis.objects.create(
             user=user,
             profile_snapshot=snapshot,
@@ -25,22 +25,22 @@ class AnalysisResultSelectorTests(TestCase):
         AnalysisSection.objects.create(
             analysis=cls.analysis,
             section=AnalysisSection.Section.HEADLINE,
-            original_text="Desenvolvedor",
+            original_text="Developer",
             suggested_text="Backend Developer",
             variant_index=0,
         )
         AnalysisSection.objects.create(
             analysis=cls.analysis,
             section=AnalysisSection.Section.HEADLINE,
-            original_text="Desenvolvedor",
-            suggested_text="Engenheiro Backend",
+            original_text="Developer",
+            suggested_text="Backend Engineer",
             variant_index=1,
         )
         AnalysisSection.objects.create(
             analysis=cls.analysis,
             section=AnalysisSection.Section.ABOUT,
-            original_text="texto igual",
-            suggested_text="texto igual",
+            original_text="same text",
+            suggested_text="same text",
             variant_index=0,
         )
 

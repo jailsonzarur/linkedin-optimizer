@@ -1,5 +1,5 @@
 {% comment %}
-One section of the split-pane diff (Headline, Sobre, Experiência).
+One section of the split-pane diff (Headline, About, Experience).
 
 Params:
   group  dict built by analysis.views._build_groups
@@ -15,12 +15,12 @@ untouched rows when the user filters down to just the changes.
       {% if group.total > 1 %}
         {% include "components/_pill.html" with text=group.changed_summary tone=group.tone %}
       {% else %}
-        {% include "components/_pill.html" with text="reescrito" tone=group.tone %}
+        {% include "components/_pill.html" with text="rewritten" tone=group.tone %}
       {% endif %}
     {% endif %}
     <div class="section-rule"></div>
     {% if group.alternates %}
-      <span class="t-xs dim">{{ group.alternates }} variação{{ group.alternates|pluralize:"es" }} alternativa{{ group.alternates|pluralize:"s" }}</span>
+      <span class="t-xs dim">{{ group.alternates }} alternative{{ group.alternates|pluralize }}</span>
     {% endif %}
   </div>
 
@@ -39,8 +39,8 @@ untouched rows when the user filters down to just the changes.
             <button type="button" class="btn btn--ghost btn--sm"
                     @click="navigator.clipboard.writeText($refs.text.innerText.trim()); copied = true; setTimeout(() => copied = false, 1500)">
               {% include "components/_icon.html" with name="copy" size=13 %}
-              <span x-show="!copied">Copiar</span>
-              <span x-show="copied" x-cloak class="t-accent">Copiado</span>
+              <span x-show="!copied">Copy</span>
+              <span x-show="copied" x-cloak class="t-accent">Copied</span>
             </button>
           </div>
         {% endif %}

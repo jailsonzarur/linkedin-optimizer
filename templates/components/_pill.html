@@ -5,6 +5,6 @@ Params:
   text  (required)
   tone  accent | warn | danger | "" (neutral, default)
 Usage:
-  {% include "components/_pill.html" with text="45% · crítico" tone="danger" %}
+  {% include "components/_pill.html" with text="45% · critical" tone="danger" %}
 {% endcomment %}
 <span class="pill{% if tone %} pill--{{ tone }}{% endif %}">{{ text }}</span>

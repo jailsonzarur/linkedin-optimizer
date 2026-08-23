@@ -15,20 +15,20 @@ class StyledFormMixin:
 
 class SignupForm(StyledFormMixin, UserCreationForm):
     email = forms.EmailField(
-        label="E-mail",
+        label="Email",
         required=True,
-        widget=forms.EmailInput(attrs={"autocomplete": "email", "placeholder": "voce@exemplo.com"}),
+        widget=forms.EmailInput(attrs={"autocomplete": "email", "placeholder": "you@example.com"}),
     )
 
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
         fields = ("username", "email")
-        labels = {"username": "Usuário"}
+        labels = {"username": "Username"}
 
     def clean_email(self):
         email = self.cleaned_data["email"]
         if get_user_model().objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError("Já existe uma conta com esse e-mail.")
+            raise forms.ValidationError("An account with this email already exists.")
         return email
 
     def save(self, commit=True):
@@ -41,10 +41,10 @@ class SignupForm(StyledFormMixin, UserCreationForm):
 
 class LoginForm(StyledFormMixin, AuthenticationForm):
     username = forms.CharField(
-        label="Usuário",
+        label="Username",
         widget=forms.TextInput(attrs={"autocomplete": "username", "autofocus": True}),
     )
     password = forms.CharField(
-        label="Senha",
+        label="Password",
         widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
     )

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Entrar · LinkedIn Optimizer{% endblock %}
+{% block title %}Sign in · LinkedIn Optimizer{% endblock %}
 {% block chrome %}{% endblock %}
 
 {% block content %}
@@ -16,8 +16,8 @@
       <div class="card__body stack gap-5">
 
         <div class="stack gap-1 auth__title">
-          <h1 class="t-lg">Entrar na sua conta</h1>
-          <p class="t-sm muted">Continue de onde você parou.</p>
+          <h1 class="t-lg">Sign in to your account</h1>
+          <p class="t-sm muted">Pick up where you left off.</p>
         </div>
 
         {% if form.non_field_errors %}
@@ -34,11 +34,11 @@
           {% include "components/_field.html" with field=form.username %}
           {% include "components/_field.html" with field=form.password %}
           {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
-          <button type="submit" class="btn btn--primary btn--block">Entrar</button>
+          <button type="submit" class="btn btn--primary btn--block">Sign in</button>
         </form>
 
         <p class="auth__foot">
-          Ainda não tem conta? <a href="{% url 'accounts:signup' %}">Criar conta</a>
+          No account yet? <a href="{% url 'accounts:signup' %}">Create one</a>
         </p>
 
       </div>

@@ -9,12 +9,12 @@ class AnalysisResultAccessTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.owner = get_user_model().objects.create_user(
-            username="dono", password="senha-bem-longa-123"
+            username="owner", password="senha-bem-longa-123"
         )
         cls.intruder = get_user_model().objects.create_user(
-            username="intruso", password="senha-bem-longa-123"
+            username="intruder", password="senha-bem-longa-123"
         )
-        snapshot = ProfileSnapshot.objects.create(user=cls.owner, raw_content="perfil")
+        snapshot = ProfileSnapshot.objects.create(user=cls.owner, raw_content="profile")
         cls.analysis = Analysis.objects.create(
             user=cls.owner, profile_snapshot=snapshot, overall_score=68
         )
@@ -28,9 +28,9 @@ class AnalysisResultAccessTests(TestCase):
         self.assertIn(reverse("accounts:login"), response.url)
 
     def test_owner_can_see_the_analysis(self):
-        self.client.login(username="dono", password="senha-bem-longa-123")
+        self.client.login(username="owner", password="senha-bem-longa-123")
         self.assertEqual(self.client.get(self.url()).status_code, 200)
 
     def test_another_user_gets_404(self):
-        self.client.login(username="intruso", password="senha-bem-longa-123")
+        self.client.login(username="intruder", password="senha-bem-longa-123")
         self.assertEqual(self.client.get(self.url()).status_code, 404)

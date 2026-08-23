@@ -6,8 +6,8 @@ from analysis.services.scoring import ScorePalette
 class AnalysisResultSelector:
     SECTION_ORDER = [
         (AnalysisSection.Section.HEADLINE, "Headline"),
-        (AnalysisSection.Section.ABOUT, "Sobre"),
-        (AnalysisSection.Section.EXPERIENCE_BULLET, "Experiência"),
+        (AnalysisSection.Section.ABOUT, "About"),
+        (AnalysisSection.Section.EXPERIENCE_BULLET, "Experience"),
     ]
     PRIMARY_VARIANT = 0
 
@@ -53,7 +53,7 @@ class AnalysisResultSelector:
                     "label": label,
                     "rows": rows,
                     "changed_count": changed_count,
-                    "changed_summary": f"{changed_count} de {len(rows)} alterados",
+                    "changed_summary": f"{changed_count} of {len(rows)} changed",
                     "total": len(rows),
                     "alternates": self._alternates_for(key),
                     "tone": ScorePalette.tone(
@@ -97,7 +97,7 @@ class AnalysisResultSelector:
                     "present": present,
                     "supported": entry.get("supported", False),
                     "tone": ScorePalette.ACCENT if present else ScorePalette.DANGER,
-                    "note": f"{coverage}% das vagas · {'presente' if present else 'ausente'}",
+                    "note": f"{coverage}% of jobs · {'present' if present else 'missing'}",
                 }
             )
         return rows
@@ -133,4 +133,4 @@ class AnalysisResultSelector:
             return ""
         if len(items) == 1:
             return items[0]
-        return f"{', '.join(items[:-1])} e {items[-1]}"
+        return f"{', '.join(items[:-1])} and {items[-1]}"

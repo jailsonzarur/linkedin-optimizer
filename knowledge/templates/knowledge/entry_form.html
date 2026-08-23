@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Add knowledge · LinkedIn Optimizer{% endblock %}
+
+{% block content %}
+<div class="shell stack gap-5" style="padding-top: var(--sp-6); padding-bottom: var(--sp-7); max-width: 780px;"
+     x-data="composer">
+
+  <div class="stack gap-1">
+    <h1 class="t-xl">Add knowledge</h1>
+    <p class="t-sm muted">Add as many blocks as you like. Each one becomes its own source, processed independently.</p>
+  </div>
+
+  {% if errors %}
+    <div class="alert">
+      {% include "components/_icon.html" with name="alert" size=15 %}
+      <div class="stack gap-1">
+        {% for error in errors %}<span>{{ error }}</span>{% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="stack gap-4">
+    {% csrf_token %}
+
+    <div class="field">
+      <label class="field__label" for="id_title">Title</label>
+      <input class="input" type="text" name="title" id="id_title" value="{{ title|default:'' }}"
+             placeholder="e.g. my time at TechCorp" maxlength="120">
+    </div>
+
+    <div class="row gap-2" style="flex-wrap: wrap;">
+      <button type="button" class="btn btn--sm" @click="addText()">
+        {% include "components/_icon.html" with name="text" size=14 %}
+        <span>Text</span>
+      </button>
+      <button type="button" class="btn btn--sm" @click="addAudio()" :disabled="hasAudioBlock"
+              :style="hasAudioBlock && 'opacity:.45; cursor:not-allowed'">
+        {% include "components/_icon.html" with name="mic" size=14 %}
+        <span>Audio</span>
+      </button>
+    </div>
+
+    <template x-if="blocks.length === 0">
+      <div class="empty">
+        <span class="dim">{% include "components/_icon.html" with name="plus" size=22 %}</span>
+        <div class="stack gap-1">
+          <span class="t-lg">Start by adding a block</span>
+          <span class="t-sm muted">Text to write it down, audio to say it out loud. You can mix both.</span>
+        </div>
+      </div>
+    </template>
+
+    <div class="stack gap-3">
+      <template x-for="block in blocks" :key="block.id">
+        <div class="block">
+
+          <div class="block__head">
+            <span class="block__title">
+              <span x-show="block.type === 'text'">{% include "components/_icon.html" with name="text" size=14 %}</span>
+              <span x-show="block.type === 'audio'">{% include "components/_icon.html" with name="mic" size=14 %}</span>
+              <span x-text="block.type === 'text' ? 'Text' : 'Audio'"></span>
+            </span>
+            <button type="button" class="btn btn--ghost btn--sm" @click="remove(block.id)">
+              {% include "components/_icon.html" with name="trash" size=13 %}
+              <span>Remove</span>
+            </button>
+          </div>
+
+          <div class="block__body">
+
+            <template x-if="block.type === 'text'">
+              <textarea class="textarea" name="text_content"
+                        placeholder="Describe an experience, a project, an achievement. Write it the way you would say it."></textarea>
+            </template>
+
+            <template x-if="block.type === 'audio'">
+              <div class="stack gap-4" x-data="audioBlock" x-destroy="destroy()">
+
+                <input type="file" name="audio_files" x-ref="input" multiple accept="audio/*" hidden
+                       @change="addFiles($event.target.files)">
+
+                <div class="recorder">
+                  <template x-if="canRecord">
+                    <button type="button" class="btn btn--sm" :class="recording && 'btn--primary'"
+                            @click="toggleRecording()">
+                      <span x-show="!recording">{% include "components/_icon.html" with name="mic" size=14 %}</span>
+                      <span x-show="recording" x-cloak>{% include "components/_icon.html" with name="stop" size=14 %}</span>
+                      <span x-text="recording ? 'Stop' : 'Record'"></span>
+                    </button>
+                  </template>
+
+                  <button type="button" class="btn btn--sm" @click="$refs.input.click()">
+                    {% include "components/_icon.html" with name="upload" size=14 %}
+                    <span>Import file</span>
+                  </button>
+
+                  <template x-if="recording">
+                    <span class="row gap-2 t-sm" x-cloak>
+                      <span class="rec-dot"></span>
+                      <span class="num t-danger" x-text="formatTime(elapsed)"></span>
+                    </span>
+                  </template>
+
+                  <template x-if="!canRecord">
+                    <span class="t-xs dim">Your browser cannot record here — import a file instead.</span>
+                  </template>
+                </div>
+
+                <template x-if="error">
+                  <div class="alert" x-cloak>
+                    {% include "components/_icon.html" with name="alert" size=15 %}
+                    <span x-text="error"></span>
+                  </div>
+                </template>
+
+                <template x-if="items.length">
+                  <div class="filelist">
+                    <template x-for="item in items" :key="item.key">
+                      <div class="fileitem">
+                        <div class="fileitem__head">
+                          <span class="filerow__name">
+                            <span class="dim" x-show="item.recorded">{% include "components/_icon.html" with name="mic" size=13 %}</span>
+                            <span class="dim" x-show="!item.recorded">{% include "components/_icon.html" with name="upload" size=13 %}</span>
+                            <span x-text="item.name"></span>
+                          </span>
+                          <span class="row gap-3">
+                            <span class="num t-xs dim" x-text="formatSize(item.size)"></span>
+                            <button type="button" class="btn btn--ghost btn--sm" @click="remove(item.key)">
+                              {% include "components/_icon.html" with name="trash" size=13 %}
+                            </button>
+                          </span>
+                        </div>
+                        <audio controls preload="metadata" :src="item.url"></audio>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+
+                <p class="t-xs dim">Up to 25 MB per file. Audio is transcribed on the server, then discarded.</p>
+              </div>
+            </template>
+
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="row gap-2" style="justify-content: flex-end;">
+      <a class="btn" href="{% url 'knowledge:list' %}">Cancel</a>
+      <button type="submit" class="btn btn--primary" :disabled="blocks.length === 0"
+              :style="blocks.length === 0 && 'opacity:.45; cursor:not-allowed'">Save</button>
+    </div>
+
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/knowledge-composer.js' %}" defer></script>
+{% endblock %}

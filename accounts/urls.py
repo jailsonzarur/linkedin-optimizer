@@ -9,7 +9,7 @@ app_name = "accounts"
 urlpatterns = [
     path("", home, name="home"),
     path(
-        "entrar/",
+        "sign-in/",
         auth_views.LoginView.as_view(
             template_name="accounts/login.html",
             authentication_form=LoginForm,
@@ -17,6 +17,6 @@ urlpatterns = [
         ),
         name="login",
     ),
-    path("sair/", auth_views.LogoutView.as_view(), name="logout"),
-    path("criar-conta/", signup, name="signup"),
+    path("sign-out/", auth_views.LogoutView.as_view(), name="logout"),
+    path("sign-up/", signup, name="signup"),
 ]

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Resultado da análise · LinkedIn Optimizer{% endblock %}
+{% block title %}Analysis result · LinkedIn Optimizer{% endblock %}
 
 {% block content %}
 <div class="shell stack gap-5" style="padding-top: var(--sp-6); padding-bottom: var(--sp-7);"
@@ -10,10 +10,10 @@
   {# ---------- page header ---------- #}
   <div class="row spread gap-4" style="flex-wrap: wrap; align-items: flex-end;">
     <div class="stack gap-1">
-      <h1 class="t-xl">Perfil otimizado</h1>
+      <h1 class="t-xl">Optimized profile</h1>
       <p class="t-sm muted">
         {{ analysis.user.get_full_name|default:analysis.user.get_username }}
-        · analisado em {{ analysis.created_at|date:"j M Y" }}
+        · analyzed on {{ analysis.created_at|date:"j M Y" }}
       </p>
     </div>
 
@@ -23,14 +23,14 @@
               @click="onlyChanges = !onlyChanges"
               :aria-pressed="onlyChanges">
         {% include "components/_icon.html" with name="filter" size=14 %}
-        <span x-text="onlyChanges ? 'Mostrando só mudanças' : 'Ver só mudanças'">Ver só mudanças</span>
+        <span x-text="onlyChanges ? 'Showing changes only' : 'Show changes only'">Show changes only</span>
       </button>
 
       <button type="button" class="btn btn--primary"
               @click="navigator.clipboard.writeText($refs.fullText.innerText.trim()); copiedAll = true; setTimeout(() => copiedAll = false, 1800)">
         {% include "components/_icon.html" with name="copy" size=14 %}
-        <span x-show="!copiedAll">Copiar tudo</span>
-        <span x-show="copiedAll" x-cloak>Copiado</span>
+        <span x-show="!copiedAll">Copy all</span>
+        <span x-show="copiedAll" x-cloak>Copied</span>
       </button>
     </div>
   </div>
@@ -45,11 +45,11 @@
   <div class="panes panes--labels">
     <div class="pane-head pane-head--current">
       {% include "components/_icon.html" with name="circle" size=14 %}
-      <span>Perfil atual</span>
+      <span>Current profile</span>
     </div>
     <div class="pane-head pane-head--optimized">
       {% include "components/_icon.html" with name="check" size=14 %}
-      <span>Versão otimizada</span>
+      <span>Optimized version</span>
     </div>
   </div>
 
@@ -58,7 +58,7 @@
     {% for group in groups %}
       {% include "analysis/partials/_diff_section.html" %}
     {% empty %}
-      <div class="card"><div class="card__body muted">Esta análise ainda não gerou sugestões.</div></div>
+      <div class="card"><div class="card__body muted">This analysis has not produced suggestions yet.</div></div>
     {% endfor %}
   </div>
 
@@ -71,10 +71,10 @@
           <span class="disclosure__chevron" :data-open="open" style="display: inline-flex;">
             {% include "components/_icon.html" with name="chevron" size=14 %}
           </span>
-          <span>Score da análise</span>
+          <span>Analysis score</span>
           <span class="num t-sm {% if overall_tone %}t-{{ overall_tone }}{% else %}muted{% endif %}">{{ analysis.overall_score }}/100</span>
         </span>
-        <span class="t-xs dim" x-text="open ? 'ocultar' : 'ver detalhes'">ver detalhes</span>
+        <span class="t-xs dim" x-text="open ? 'hide' : 'details'">details</span>
       </button>
 
       <div class="disclosure__panel" x-show="open" x-cloak x-transition.opacity>
@@ -92,10 +92,10 @@
           <span class="disclosure__chevron" :data-open="open" style="display: inline-flex;">
             {% include "components/_icon.html" with name="chevron" size=14 %}
           </span>
-          <span>Gap de keywords</span>
-          <span class="t-sm muted">{{ keyword_missing_count }} termo{{ keyword_missing_count|pluralize }} ausente{{ keyword_missing_count|pluralize }}</span>
+          <span>Keyword gap</span>
+          <span class="t-sm muted">{{ keyword_missing_count }} term{{ keyword_missing_count|pluralize }} missing</span>
         </span>
-        <span class="t-xs dim" x-text="open ? 'ocultar' : 'ver detalhes'">ver detalhes</span>
+        <span class="t-xs dim" x-text="open ? 'hide' : 'details'">details</span>
       </button>
 
       <div class="disclosure__panel" x-show="open" x-cloak x-transition.opacity>
@@ -110,8 +110,8 @@
                 {% include "components/_icon.html" with name="alert" size=15 %}
               </span>
               <p class="t-sm muted">
-                Sua base de conhecimento não sustenta {{ unsupported_terms }}. Confirme antes de adicionar —
-                o objetivo é reestruturar o que você já tem, nunca inventar experiência.
+                Your knowledge base does not back {{ unsupported_terms }}. Confirm before adding it —
+                the goal is to restructure what you already have, never to invent experience.
               </p>
             </div>
           {% endif %}

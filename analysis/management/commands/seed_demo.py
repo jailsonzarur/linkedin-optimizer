@@ -4,37 +4,37 @@ from django.db import transaction
 
 from analysis.models import Analysis, AnalysisSection, ProfileSnapshot
 
-HEADLINE_ORIGINAL = "Desenvolvedor na TechCorp"
+HEADLINE_ORIGINAL = "Developer at TechCorp"
 HEADLINE_VARIANTS = [
-    "Backend Developer · Python, Django e PostgreSQL · APIs de alta escala",
-    "Engenheiro de Software Backend · Django, Docker, AWS · Sistemas distribuídos",
-    "Backend Developer @ TechCorp · Python · Escalabilidade e performance de APIs",
+    "Backend Developer · Python, Django and PostgreSQL · High-scale APIs",
+    "Backend Software Engineer · Django, Docker, AWS · Distributed systems",
+    "Backend Developer @ TechCorp · Python · API scalability and performance",
 ]
 
 ABOUT_ORIGINAL = (
-    "Sou desenvolvedor apaixonado por tecnologia, sempre buscando aprender coisas novas. "
-    "Tenho experiência com desenvolvimento web e gosto de trabalhar em equipe. "
-    "Atualmente trabalho na TechCorp, onde atuo no time de plataforma."
+    "I am a developer passionate about technology, always looking to learn new things. "
+    "I have experience with web development and I enjoy working in a team. "
+    "I currently work at TechCorp, on the platform team."
 )
 ABOUT_SUGGESTED = (
-    "Sou desenvolvedor apaixonado por tecnologia, sempre buscando aprender coisas novas. "
-    "Trabalho há 5 anos com Python e Django construindo APIs REST que sustentam picos de "
-    "40 mil requisições por minuto, com foco em performance e observabilidade. "
-    "Atualmente trabalho na TechCorp, onde atuo no time de plataforma."
+    "I am a developer passionate about technology, always looking to learn new things. "
+    "For 5 years I have built REST APIs in Python and Django that sustain peaks of "
+    "40k requests per minute, focused on performance and observability. "
+    "I currently work at TechCorp, on the platform team."
 )
 
 BULLETS = [
     (
-        "Responsável pelo desenvolvimento de APIs.",
-        "Desenvolvi 12 APIs REST em Django que sustentam 40k req/min, reduzindo a latência p95 em 38%.",
+        "Responsible for API development.",
+        "Built 12 REST APIs in Django sustaining 40k req/min, cutting p95 latency by 38%.",
     ),
     (
-        "Participei da migração do sistema legado.",
-        "Liderei a migração de um monolito PHP para serviços Django em Docker, sem downtime, ao longo de 7 meses.",
+        "Took part in the legacy system migration.",
+        "Led the migration of a PHP monolith to Dockerised Django services with zero downtime over 7 months.",
     ),
     (
-        "Atuei em code review e mentoria de estagiários.",
-        "Atuei em code review e mentoria de estagiários.",
+        "Ran code reviews and mentored interns.",
+        "Ran code reviews and mentored interns.",
     ),
 ]
 
@@ -120,4 +120,4 @@ class Command(BaseCommand):
                 variant_index=0,
             )
 
-        self.stdout.write(self.style.SUCCESS(f"Analysis #{analysis.pk} created for {user.username} at /analise/{analysis.pk}/"))
+        self.stdout.write(self.style.SUCCESS(f"Analysis #{analysis.pk} created for {user.username} at /analysis/{analysis.pk}/"))

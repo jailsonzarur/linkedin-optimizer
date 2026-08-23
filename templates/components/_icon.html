@@ -3,6 +3,7 @@ Icon set — every icon in the app comes from here so stroke weight and grid sta
 
 Params:
   name  chevron | check | alert | info | copy | refresh | bars | circle | filter
+        | plus | trash | mic | stop | upload | text
   size  px, default 16
 Usage:
   {% include "components/_icon.html" with name="check" size=14 %}
@@ -19,5 +20,11 @@ Usage:
   {% elif name == "bars" %}<path d="M4 20V11M10 20V4M16 20v-6M22 20H2"/>
   {% elif name == "circle" %}<circle cx="12" cy="12" r="9"/>
   {% elif name == "filter" %}<path d="M3 5h18M7 12h10M11 19h2"/>
+  {% elif name == "plus" %}<path d="M12 5v14M5 12h14"/>
+  {% elif name == "trash" %}<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>
+  {% elif name == "mic" %}<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>
+  {% elif name == "stop" %}<rect x="6" y="6" width="12" height="12" rx="2"/>
+  {% elif name == "upload" %}<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>
+  {% elif name == "text" %}<path d="M4 6h16M4 12h16M4 18h10"/>
   {% endif %}
 </svg>

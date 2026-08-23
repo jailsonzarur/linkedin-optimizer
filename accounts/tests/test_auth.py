@@ -84,9 +84,9 @@ class SignupFormRenderTests(TestCase):
     def test_password_help_is_condensed_not_the_django_default(self):
         response = self.client.get(reverse("accounts:signup"))
         body = response.content.decode()
-        self.assertIn("Pelo menos 8 caracteres", body)
-        self.assertNotIn("Sua senha não pode ser muito parecida", body)
+        self.assertIn("At least 8 characters", body)
+        self.assertNotIn("too similar to", body)
 
     def test_confirmation_field_has_no_help_text(self):
         response = self.client.get(reverse("accounts:signup"))
-        self.assertNotIn("Informe a mesma senha informada anteriormente", response.content.decode())
+        self.assertNotIn("Enter the same password as before", response.content.decode())
