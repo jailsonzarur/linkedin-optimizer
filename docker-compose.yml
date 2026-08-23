@@ -1,3 +1,20 @@
+x-app: &app
+  build: .
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    # Inside the compose network the services answer on their own names and
+    # default ports, so the host-facing URLs in .env do not apply here.
+    DATABASE_URL: postgres://linkedin_optimizer:linkedin_optimizer@db:5432/linkedin_optimizer
+    CELERY_BROKER_URL: redis://redis:6379/0
+  volumes:
+    - .:/app
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -26,6 +43,27 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  web:
+    <<: *app
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+
+  worker:
+    <<: *app
+    command: celery -A config worker -l info -Q knowledge,default
+    # The web service owns migrations; the worker only needs the schema to
+    # already be there when it starts consuming.
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_started
 
 volumes:
   db_data:
