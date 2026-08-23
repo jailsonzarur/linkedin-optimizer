@@ -2,9 +2,14 @@
 Small status chip.
 
 Params:
-  text  (required)
-  tone  accent | warn | danger | "" (neutral, default)
+  text     (required)
+  tone     accent | warn | danger | "" (neutral, default)
+  spinner  pass True to prefix a spinning ring, for states still in progress
 Usage:
   {% include "components/_pill.html" with text="45% · critical" tone="danger" %}
+  {% include "components/_pill.html" with text="processing" tone="warn" spinner=True %}
 {% endcomment %}
-<span class="pill{% if tone %} pill--{{ tone }}{% endif %}">{{ text }}</span>
+<span class="pill{% if tone %} pill--{{ tone }}{% endif %}">
+  {% if spinner %}<span class="spinner" aria-hidden="true"></span>{% endif %}
+  <span>{{ text }}</span>
+</span>

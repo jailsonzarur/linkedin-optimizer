@@ -4,6 +4,10 @@ from knowledge.models import KnowledgeEntry, KnowledgeSource
 
 
 class KnowledgeEntryListSelector:
+    # A failed entry is finished, just badly. Counting it as pending would keep
+    # the page polling for a status that is never going to change.
+    UNSETTLED = {KnowledgeEntry.Status.PENDING, KnowledgeEntry.Status.PROCESSING}
+
     def __init__(self, user):
         self.user = user
 
@@ -22,5 +26,5 @@ class KnowledgeEntryListSelector:
         return {
             "entries": entries,
             "total": len(entries),
-            "pending": sum(1 for e in entries if e.status != KnowledgeEntry.Status.READY),
+            "pending": sum(1 for e in entries if e.status in self.UNSETTLED),
         }

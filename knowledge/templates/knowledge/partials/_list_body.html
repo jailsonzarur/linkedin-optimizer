@@ -1,0 +1,56 @@
+{% comment %}
+The whole knowledge list, and the element that refreshes it.
+
+While an entry is unfinished this div re-requests itself every few seconds and
+replaces itself with the response. Once nothing is unfinished it renders
+without hx-trigger, so the replacement carries no timer and the polling stops.
+{% endcomment %}
+<div id="list-body" class="stack gap-5"
+     {% if pending %}hx-get="{% url 'knowledge:list_body' %}" hx-trigger="every 3s" hx-swap="outerHTML"{% endif %}>
+
+  <div class="row spread gap-4" style="flex-wrap: wrap; align-items: flex-end;">
+    <div class="stack gap-1">
+      <h1 class="t-xl">Knowledge base</h1>
+      <p class="t-sm muted">
+        {% if total %}
+          {{ total }} entr{{ total|pluralize:"y,ies" }}{% if pending %} · {{ pending }} still processing{% endif %}
+        {% else %}
+          What you teach the platform here is what it uses to rewrite your profile.
+        {% endif %}
+      </p>
+    </div>
+    <a class="btn btn--primary" href="{% url 'knowledge:create' %}">
+      {% include "components/_icon.html" with name="plus" size=14 %}
+      <span>Add</span>
+    </a>
+  </div>
+
+  {% if entries %}
+    <div class="stack gap-3">
+      {% for entry in entries %}
+        <a class="entry" href="{% url 'knowledge:detail' entry.pk %}">
+          <div class="stack gap-1" style="min-width: 0;">
+            <span class="t-lg">{{ entry.title|default:"Untitled" }}</span>
+            <span class="t-sm muted">
+              {% if entry.text_count %}{{ entry.text_count }} text{{ entry.text_count|pluralize }}{% endif %}
+              {% if entry.text_count and entry.audio_count %} · {% endif %}
+              {% if entry.audio_count %}{{ entry.audio_count }} audio file{{ entry.audio_count|pluralize }}{% endif %}
+              · {{ entry.created_at|date:"j M Y, H:i" }}
+            </span>
+          </div>
+          {% include "knowledge/partials/_status_pill.html" with status=entry.status %}
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <span class="dim">{% include "components/_icon.html" with name="bars" size=22 %}</span>
+      <div class="stack gap-1">
+        <span class="t-lg">Nothing here yet</span>
+        <span class="t-sm muted">Record yourself talking about your experience, or paste some text. The platform takes it from there.</span>
+      </div>
+      <a class="btn btn--primary" href="{% url 'knowledge:create' %}">Add your first</a>
+    </div>
+  {% endif %}
+
+</div>

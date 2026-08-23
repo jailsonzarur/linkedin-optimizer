@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ entry.title|default:"Entry" }} · LinkedIn Optimizer{% endblock %}
+
+{% block content %}
+<div class="shell stack gap-5" style="padding-top: var(--sp-6); padding-bottom: var(--sp-7); max-width: 860px;">
+
+  <a class="t-sm muted row gap-2" href="{% url 'knowledge:list' %}" style="width: fit-content;">
+    {% include "components/_icon.html" with name="chevron-left" size=14 %}
+    <span>Knowledge base</span>
+  </a>
+
+  {% include "knowledge/partials/_detail_body.html" %}
+
+</div>
+{% endblock %}
