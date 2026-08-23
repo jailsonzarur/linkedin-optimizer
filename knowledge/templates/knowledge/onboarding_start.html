@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Get started · LinkedIn Optimizer{% endblock %}
+
+{% block content %}
+<div class="shell stack gap-5" style="padding-top: var(--sp-7); padding-bottom: var(--sp-7); max-width: 620px;">
+
+  <div class="stack gap-2">
+    <h1 class="t-xl">Let's start with what you already have</h1>
+    <p class="t-sm muted">
+      We read your current profile first, so the conversation that follows can ask
+      about what is missing instead of what you already wrote down.
+    </p>
+  </div>
+
+  {% if errors %}
+    <div class="alert">
+      {% include "components/_icon.html" with name="alert" size=15 %}
+      <div class="stack gap-1">
+        {% for error in errors %}<span>{{ error }}</span>{% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'knowledge:onboarding_create' %}"
+        enctype="multipart/form-data" class="stack gap-4">
+    {% csrf_token %}
+
+    <div class="card">
+      <div class="card__body stack gap-3">
+        <div class="row spread gap-3" style="align-items: baseline;">
+          <span class="t-lg">Your LinkedIn profile</span>
+          {% include "components/_pill.html" with text="required" tone="accent" %}
+        </div>
+        <p class="t-sm muted">
+          On your profile, open <strong>More</strong> and choose
+          <strong>Save to PDF</strong>. That export is what we judge — it is your
+          profile exactly as it stands today.
+        </p>
+        <input class="file" type="file" name="linkedin_pdf" accept="application/pdf" required>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__body stack gap-3">
+        <div class="row spread gap-3" style="align-items: baseline;">
+          <span class="t-lg">Your most recent résumé</span>
+          {% include "components/_pill.html" with text="optional" %}
+        </div>
+        <p class="t-sm muted">
+          Worth adding. A résumé usually holds things people never got around to
+          putting on LinkedIn — and anything in it that is missing from your
+          profile is exactly what we are looking for.
+        </p>
+        <input class="file" type="file" name="resume" accept="application/pdf">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn--primary btn--block">Read my profile</button>
+  </form>
+
+  <p class="t-sm muted" style="text-align: center;">
+    <a href="{% url 'accounts:home' %}">Skip for now</a>
+  </p>
+
+</div>
+{% endblock %}

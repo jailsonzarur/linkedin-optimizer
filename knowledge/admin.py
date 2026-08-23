@@ -1,19 +1,21 @@
 from django.contrib import admin
 
-from .models import KnowledgeChunk, KnowledgeEntry, KnowledgeSource
+from .models import Conversation, Message, ProfileImport
 
 
-class KnowledgeSourceInline(admin.TabularInline):
-    model = KnowledgeSource
+class MessageInline(admin.TabularInline):
+    model = Message
     extra = 0
 
 
-@admin.register(KnowledgeEntry)
-class KnowledgeEntryAdmin(admin.ModelAdmin):
+@admin.register(ProfileImport)
+class ProfileImportAdmin(admin.ModelAdmin):
     list_display = ("__str__", "user", "status", "created_at")
     list_filter = ("status",)
-    inlines = [KnowledgeSourceInline]
 
 
-admin.site.register(KnowledgeSource)
-admin.site.register(KnowledgeChunk)
+@admin.register(Conversation)
+class ConversationAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "user", "status", "created_at")
+    list_filter = ("status",)
+    inlines = [MessageInline]

@@ -10,6 +10,14 @@
     <p class="t-sm muted">This home is still a sketch — the areas below land as each phase ships.</p>
   </div>
 
+  {% if not onboarding_done %}
+    <a class="alert" style="border-color: var(--warn); background: var(--warn-wash); color: var(--warn); text-decoration: none;"
+       href="{% if pending_import %}{% url 'knowledge:onboarding_progress' pending_import.pk %}{% else %}{% url 'knowledge:onboarding_start' %}{% endif %}">
+      {% include "components/_icon.html" with name="alert" size=15 %}
+      <span>You have not finished setting up yet. Pick up where you left off →</span>
+    </a>
+  {% endif %}
+
   <div class="panes">
     {% if latest_analysis %}
       <a class="tile tile--live" href="{% url 'analysis:result' latest_analysis.pk %}" style="color: var(--text);">
@@ -28,13 +36,13 @@
       </div>
     {% endif %}
 
-    <a class="tile tile--live" href="{% url 'knowledge:list' %}" style="color: var(--text);">
+    <div class="tile">
       <span class="row spread gap-3">
         <span class="t-lg">Knowledge base</span>
-        {% include "components/_icon.html" with name="chevron" size=15 %}
+        {% include "components/_pill.html" with text="coming soon" %}
       </span>
-      <span class="t-sm muted">Audio and free text that teach the platform about you.</span>
-    </a>
+      <span class="t-sm dim">The interview that teaches the platform about you.</span>
+    </div>
   </div>
 
   <div class="panes">

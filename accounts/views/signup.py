@@ -13,7 +13,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("accounts:home")
+            return redirect("knowledge:onboarding_start")
     else:
         form = SignupForm()
 

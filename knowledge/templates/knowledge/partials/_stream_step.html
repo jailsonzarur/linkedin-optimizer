@@ -1,0 +1,10 @@
+<div class="row gap-3" style="align-items: center;">
+  {% if name == "failed" %}
+    <span class="t-danger">{% include "components/_icon.html" with name="alert" size=18 %}</span>
+  {% elif name == "done" %}
+    <span class="t-accent">{% include "components/_icon.html" with name="check" size=18 %}</span>
+  {% else %}
+    <span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span>
+  {% endif %}
+  <span class="t-lg">{{ label }}</span>
+</div>

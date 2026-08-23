@@ -2,7 +2,8 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from analysis.models import Analysis, AnalysisSection, ProfileSnapshot
+from analysis.models import Analysis, AnalysisSection
+from knowledge.models import ProfileImport
 
 HEADLINE_ORIGINAL = "Developer at TechCorp"
 HEADLINE_VARIANTS = [
@@ -82,7 +83,7 @@ class Command(BaseCommand):
 
         analysis = Analysis.objects.create(
             user=user,
-            profile_snapshot=snapshot,
+            profile_import=imported,
             overall_score=68,
             overall_score_per_section={
                 "headline": 45,

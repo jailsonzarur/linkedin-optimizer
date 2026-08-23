@@ -2,7 +2,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from analysis.models import Analysis, ProfileSnapshot
+from analysis.models import Analysis
+from knowledge.models import ProfileImport
 
 
 class AnalysisResultAccessTests(TestCase):
@@ -14,9 +15,9 @@ class AnalysisResultAccessTests(TestCase):
         cls.intruder = get_user_model().objects.create_user(
             username="intruder", password="senha-bem-longa-123"
         )
-        snapshot = ProfileSnapshot.objects.create(user=cls.owner, raw_content="profile")
+        imported = ProfileImport.objects.create(user=cls.owner, linkedin_pdf="imports/test.pdf")
         cls.analysis = Analysis.objects.create(
-            user=cls.owner, profile_snapshot=snapshot, overall_score=68
+            user=cls.owner, profile_import=imported, overall_score=68
         )
 
     def url(self):

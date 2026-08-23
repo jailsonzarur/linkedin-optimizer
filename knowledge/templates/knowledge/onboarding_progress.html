@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Reading your profile · LinkedIn Optimizer{% endblock %}
+{% block chrome %}{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-sse@2.2.4" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="auth">
+  <div class="auth__card" style="max-width: 460px;">
+
+    <div class="auth__brand">
+      {% include "components/_logo.html" %}
+      <span>LinkedIn Optimizer</span>
+    </div>
+
+    <div class="card" hx-ext="sse" sse-connect="{% url 'knowledge:onboarding_stream' import.pk %}">
+      <div class="card__body stack gap-5">
+
+        <div sse-swap="step">
+          {% include "knowledge/partials/_stream_step.html" with label="Starting" detail="" name="import.started" %}
+        </div>
+
+        <ul class="stack gap-2 t-sm muted" sse-swap="log" hx-swap="beforeend"></ul>
+
+        <div sse-swap="done" hx-swap="none"
+             hx-trigger="sse:done"
+             hx-get="{% url 'knowledge:onboarding_progress' import.pk %}"
+             sse-close="done"
+             style="display:none"></div>
+        <div sse-swap="failed" sse-close="failed" style="display:none"></div>
+
+      </div>
+    </div>
+
+    <p class="auth__foot">
+      This takes a couple of minutes. You can leave the page — we will keep going.
+    </p>
+
+  </div>
+</div>
+
+<script>
+  // The `done` event carries the conversation id; go there once it arrives.
+  document.body.addEventListener("htmx:sseMessage", (event) => {
+    if (event.detail.type === "done") {
+      window.location = "{% url 'knowledge:onboarding_result' import.pk %}";
+    }
+  });
+</script>
+{% endblock %}

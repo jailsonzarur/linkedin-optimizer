@@ -2,22 +2,6 @@ from django.conf import settings
 from django.db import models
 
 
-class ProfileSnapshot(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="profile_snapshots",
-    )
-    raw_content = models.TextField()
-    collected_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["-collected_at"]
-
-    def __str__(self):
-        return f"Snapshot — {self.user} — {self.collected_at:%Y-%m-%d}"
-
-
 class Analysis(models.Model):
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
@@ -26,7 +10,7 @@ class Analysis(models.Model):
         FAILED = "failed", "Failed"
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="analyses")
-    profile_snapshot = models.ForeignKey(ProfileSnapshot, on_delete=models.CASCADE, related_name="analyses")
+    profile_import = models.ForeignKey("knowledge.ProfileImport", on_delete=models.CASCADE, related_name="analyses")
     overall_score = models.PositiveSmallIntegerField(null=True, blank=True)
     overall_score_per_section = models.JSONField(default=dict)
     keyword_gap = models.JSONField(default=list)

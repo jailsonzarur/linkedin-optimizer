@@ -1,21 +1,23 @@
 from django.urls import path
 
 from knowledge.views import (
-    entry_create,
-    entry_detail,
-    entry_detail_body,
-    entry_list,
-    entry_list_body,
-    source_update,
+    import_clear,
+    import_list,
+    onboarding_create,
+    onboarding_progress,
+    onboarding_result,
+    onboarding_start,
+    onboarding_stream,
 )
 
 app_name = "knowledge"
 
 urlpatterns = [
-    path("knowledge/", entry_list, name="list"),
-    path("knowledge/body/", entry_list_body, name="list_body"),
-    path("knowledge/new/", entry_create, name="create"),
-    path("knowledge/<int:pk>/", entry_detail, name="detail"),
-    path("knowledge/<int:pk>/body/", entry_detail_body, name="detail_body"),
-    path("knowledge/source/<int:pk>/", source_update, name="source_update"),
+    path("knowledge/", import_list, name="import_list"),
+    path("knowledge/clear/", import_clear, name="import_clear"),
+    path("onboarding/", onboarding_start, name="onboarding_start"),
+    path("onboarding/import/", onboarding_create, name="onboarding_create"),
+    path("onboarding/<int:pk>/", onboarding_progress, name="onboarding_progress"),
+    path("onboarding/<int:pk>/stream/", onboarding_stream, name="onboarding_stream"),
+    path("onboarding/<int:pk>/result/", onboarding_result, name="onboarding_result"),
 ]

@@ -11,8 +11,7 @@ Anonymous visitors get a sign-in link instead of the app nav.
 
     <nav class="topbar__nav">
       {% if request.user.is_authenticated %}
-        <a class="topbar__link" href="{% url 'knowledge:list' %}">Knowledge base</a>
-        <a class="topbar__link" href="#">History</a>
+        <a class="topbar__link" href="{% url 'knowledge:import_list' %}">Knowledge base</a>
         <form method="post" action="{% url 'accounts:logout' %}">
           {% csrf_token %}
           <button type="submit" class="btn btn--ghost btn--sm">Sign out</button>

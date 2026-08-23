@@ -14,7 +14,7 @@ class SignupTests(TestCase):
                 "password2": "uma-senha-bem-longa-123",
             },
         )
-        self.assertRedirects(response, reverse("accounts:home"))
+        self.assertRedirects(response, reverse("knowledge:onboarding_start"))
         user = get_user_model().objects.get(username="novato")
         self.assertEqual(user.email, "novato@example.com")
         self.assertEqual(self.client.session["_auth_user_id"], str(user.pk))

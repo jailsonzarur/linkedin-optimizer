@@ -46,9 +46,11 @@ services:
 
   web:
     <<: *app
+    # uvicorn rather than runserver: the onboarding stream is an async view, and
+    # runserver is WSGI, where each open stream would pin a worker thread.
     command: >
       sh -c "python manage.py migrate --noinput &&
-             python manage.py runserver 0.0.0.0:8000"
+             uvicorn config.asgi:application --host 0.0.0.0 --port 8000 --reload"
     ports:
       - "${WEB_PORT:-8000}:8000"
 

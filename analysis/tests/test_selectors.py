@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from analysis.models import Analysis, AnalysisSection, ProfileSnapshot
+from analysis.models import Analysis, AnalysisSection
+from knowledge.models import ProfileImport
 from analysis.selectors.result import AnalysisResultSelector
 
 
@@ -10,10 +11,10 @@ class AnalysisResultSelectorTests(TestCase):
     def setUpTestData(cls):
         cls.user = get_user_model().objects.create_user(username="tester")
         user = cls.user
-        snapshot = ProfileSnapshot.objects.create(user=user, raw_content="profile")
+        imported = ProfileImport.objects.create(user=user, linkedin_pdf="imports/test.pdf")
         cls.analysis = Analysis.objects.create(
             user=user,
-            profile_snapshot=snapshot,
+            profile_import=imported,
             overall_score=68,
             overall_score_per_section={"headline": 45, "about": 72, "keywords": 38},
             keyword_gap=[

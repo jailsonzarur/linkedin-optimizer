@@ -1,0 +1,9 @@
+{% if kind == "remove" %}
+  {% include "components/_pill.html" with text="remove" tone="danger" %}
+{% elif kind == "missing" %}
+  {% include "components/_pill.html" with text="missing" tone="warn" %}
+{% elif kind == "weak" %}
+  {% include "components/_pill.html" with text="weak" tone="warn" %}
+{% else %}
+  {% include "components/_pill.html" with text="unclear" %}
+{% endif %}

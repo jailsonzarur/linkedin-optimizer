@@ -134,6 +134,15 @@ OPENAI_TRANSCRIBE_MODEL = env("OPENAI_TRANSCRIBE_MODEL", default="whisper-1")
 OPENAI_EMBEDDING_MODEL = env("OPENAI_EMBEDDING_MODEL", default="text-embedding-3-small")
 OPENAI_EXTRACTION_MODEL = env("OPENAI_EXTRACTION_MODEL", default="gpt-4o-mini")
 
+# --- Bright Data ---
+BRIGHTDATA_API_TOKEN = env("BRIGHTDATA_API_TOKEN", default="")
+BRIGHTDATA_DATASET_ID = env("BRIGHTDATA_DATASET_ID", default="")
+BRIGHTDATA_POLL_SECONDS = 6
+BRIGHTDATA_TIMEOUT_SECONDS = 180
+
+# A scrape costs credits, so a bad URL retried in a loop burns the quota.
+ONBOARDING_MAX_ATTEMPTS = 3
+
 # Rough ceiling on how much text goes into one extraction call, counted in
 # characters so it needs no tokenizer. Longer entries are split into batches.
 KNOWLEDGE_EXTRACTION_CHAR_LIMIT = 24_000
