@@ -62,7 +62,7 @@ class KnowledgeChunk(models.Model):
         EDUCATION = "education", "Education"
         OTHER = "other", "Other"
 
-    source = models.ForeignKey(KnowledgeSource, on_delete=models.CASCADE, related_name="chunks")
+    entry = models.ForeignKey(KnowledgeEntry, on_delete=models.CASCADE, related_name="chunks")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="knowledge_chunks")
     content = models.TextField()
     category = models.CharField(max_length=20, choices=Category.choices)

@@ -115,5 +115,25 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
+# Two worker processes cap how much audio is held in memory at once. With
+# prefetch_multiplier at 1 each worker reserves a single task, so the ceiling is
+# two files rather than two times the prefetch batch.
+CELERY_WORKER_CONCURRENCY = 2
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 50
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+CELERY_TASK_DEFAULT_QUEUE = "default"
+CELERY_TASK_ROUTES = {
+    "knowledge.tasks.*": {"queue": "knowledge"},
+}
+
 # --- OpenAI ---
 OPENAI_API_KEY = env("OPENAI_API_KEY", default="")
+OPENAI_TRANSCRIBE_MODEL = env("OPENAI_TRANSCRIBE_MODEL", default="whisper-1")
+OPENAI_EMBEDDING_MODEL = env("OPENAI_EMBEDDING_MODEL", default="text-embedding-3-small")
+OPENAI_EXTRACTION_MODEL = env("OPENAI_EXTRACTION_MODEL", default="gpt-4o-mini")
+
+# Rough ceiling on how much text goes into one extraction call, counted in
+# characters so it needs no tokenizer. Longer entries are split into batches.
+KNOWLEDGE_EXTRACTION_CHAR_LIMIT = 24_000

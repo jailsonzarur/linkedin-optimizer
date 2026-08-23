@@ -59,8 +59,5 @@ class KnowledgeEntryBuilder:
             )
             position += 1
 
-        entry.status = (
-            KnowledgeEntry.Status.PENDING if self.audios else KnowledgeEntry.Status.READY
-        )
-        entry.save(update_fields=["status", "updated_at"])
+        entry.save(update_fields=["updated_at"])
         return entry

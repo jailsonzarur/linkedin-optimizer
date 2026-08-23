@@ -1,7 +1,9 @@
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import redirect, render
 
 from knowledge.services.entry_builder import KnowledgeEntryBuilder
+from knowledge.tasks import process_entry
 
 
 @login_required
@@ -25,5 +27,6 @@ def entry_create(request):
             status=400,
         )
 
-    builder.save()
+    entry = builder.save()
+    transaction.on_commit(lambda: process_entry.delay(entry.pk))
     return redirect("knowledge:list")

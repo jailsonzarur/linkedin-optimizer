@@ -35,17 +35,22 @@ class KnowledgeEntryBuilderTests(TestCase):
         self.assertEqual(entry.sources.filter(type=KnowledgeSource.SourceType.TEXT).count(), 2)
         self.assertEqual(entry.sources.filter(type=KnowledgeSource.SourceType.AUDIO).count(), 1)
 
-    def test_text_only_entry_is_ready_immediately(self):
+    def test_entry_starts_pending_until_extraction_runs(self):
         builder = KnowledgeEntryBuilder(self.user)
         builder.add_text("no audio at all")
         entry = builder.save()
-        self.assertEqual(entry.status, KnowledgeEntry.Status.READY)
+        self.assertEqual(entry.status, KnowledgeEntry.Status.PENDING)
+
+    def test_text_source_needs_no_transcription(self):
+        builder = KnowledgeEntryBuilder(self.user)
+        builder.add_text("already written down")
+        source = builder.save().sources.get()
+        self.assertEqual(source.status, KnowledgeSource.Status.DONE)
 
     def test_entry_with_audio_waits_for_transcription(self):
         builder = KnowledgeEntryBuilder(self.user)
         builder.add_audio(self.audio())
         entry = builder.save()
-        self.assertEqual(entry.status, KnowledgeEntry.Status.PENDING)
         source = entry.sources.get()
         self.assertEqual(source.status, KnowledgeSource.Status.PENDING)
         self.assertEqual(source.content, "")
