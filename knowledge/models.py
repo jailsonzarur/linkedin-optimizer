@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 
 class ProfileImport(models.Model):
@@ -24,6 +26,9 @@ class ProfileImport(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["user"], name="one_profile_import_per_user"),
+        ]
 
     def __str__(self):
         return f"Import #{self.pk} — {self.user}"
@@ -73,3 +78,17 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.get_role_display()}: {self.content[:50]}"
+
+
+@receiver(post_delete, sender=ProfileImport)
+def _discard_import_files(sender, instance, **kwargs):
+    for field in ("linkedin_pdf", "resume"):
+        upload = getattr(instance, field, None)
+        if upload:
+            upload.delete(save=False)
+
+
+@receiver(post_delete, sender=Message)
+def _discard_message_audio(sender, instance, **kwargs):
+    if instance.audio_file:
+        instance.audio_file.delete(save=False)

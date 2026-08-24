@@ -116,5 +116,16 @@
 
   </div>
 
+  <div class="row" style="justify-content: flex-end; padding-top: var(--sp-5); border-top: 1px solid var(--border-soft);">
+    <form method="post" action="{% url 'knowledge:import_clear' %}"
+          onsubmit="return confirm('Delete this analysis, the profile it came from and the conversation behind it? This cannot be undone.');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn--sm" style="border-color: var(--danger); color: var(--danger);">
+        {% include "components/_icon.html" with name="trash" size=14 %}
+        <span>Delete analysis</span>
+      </button>
+    </form>
+  </div>
+
 </div>
 {% endblock %}
