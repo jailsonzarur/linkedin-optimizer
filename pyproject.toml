@@ -18,3 +18,8 @@ dependencies = [
     "redis>=8.1.0",
     "uvicorn>=0.52.4",
 ]
+
+[dependency-groups]
+dev = [
+    "reportlab>=5.0.1",
+]
