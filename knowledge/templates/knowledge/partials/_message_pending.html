@@ -1,0 +1,12 @@
+<div class="msg msg--user" id="msg-{{ message.pk }}"
+     {% if message.status != "done" %}hx-get="{% url 'knowledge:message_status' message.pk %}"
+     hx-trigger="every 2s" hx-swap="outerHTML"{% endif %}>
+  <div class="msg__body row gap-3" style="align-items: center;">
+    {% if message.status == "failed" %}
+      <span class="t-danger t-sm">Could not transcribe that recording.</span>
+    {% else %}
+      <span class="spinner"></span>
+      <span class="t-sm muted">Transcribing…</span>
+    {% endif %}
+  </div>
+</div>

@@ -97,7 +97,9 @@
 
   <div class="row gap-2" style="justify-content: flex-end;">
     <a class="btn" href="{% url 'accounts:home' %}">Back to home</a>
-    <span class="btn btn--primary" style="opacity:.45; cursor:not-allowed;">Start the conversation — coming next</span>
+    {% if conversation %}
+      <a class="btn btn--primary" href="{% url 'knowledge:conversation' conversation.pk %}">Start the conversation</a>
+    {% endif %}
   </div>
 
 </div>

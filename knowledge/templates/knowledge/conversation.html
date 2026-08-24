@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Interview · LinkedIn Optimizer{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/recorder.js' %}" defer></script>
+{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-sse@2.2.4" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="shell chat" style="max-width: 760px;">
+
+  <div class="chat__head row spread gap-3">
+    <div class="stack gap-1">
+      <h1 class="t-lg">Tell me about your work</h1>
+      <p class="t-xs dim">Answer as you would out loud. One thing at a time.</p>
+    </div>
+    <form method="post" action="{% url 'knowledge:conversation_finish' conversation.pk %}"
+          id="finish-form" style="display: none;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn--sm">Finish</button>
+    </form>
+  </div>
+
+  <div class="chat__log" id="log">
+    {% for message in messages %}
+      {% include "knowledge/partials/_message.html" with message=message %}
+    {% endfor %}
+    <div id="pending"></div>
+  </div>
+
+  <div class="chat__composer" x-data="recorder('{% url 'knowledge:conversation_audio' conversation.pk %}', '{{ csrf_token }}')"
+       x-destroy="destroy()" @answer-sent="document.getElementById('pending').insertAdjacentHTML('beforebegin', $event.detail); htmx.process(document.getElementById('log'));">
+
+    <template x-if="recording">
+      <div class="rec">
+        <canvas class="rec__wave" x-ref="wave"></canvas>
+        <span class="rec__clock" x-text="clock"></span>
+      </div>
+    </template>
+
+    <template x-if="!recording">
+      <form class="chat__composer" style="flex-grow: 1; border: none; padding: 0;" id="reply-form"
+        hx-post="{% url 'knowledge:conversation_reply' conversation.pk %}"
+        hx-target="#pending" hx-swap="beforebegin"
+        hx-on::after-request="this.reset(); startTurn();">
+    {% csrf_token %}
+    <textarea class="textarea chat__input" name="content" rows="1" required
+              placeholder="Write your answer…"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();this.form.requestSubmit();}"></textarea>
+      <button type="submit" class="btn btn--primary chat__send">
+        {% include "components/_icon.html" with name="chevron" size=16 %}
+      </button>
+      </form>
+    </template>
+
+    <template x-if="supported">
+      <button type="button" class="btn rec__mic" :class="recording && 'rec__mic--live'"
+              @click="toggle()" :disabled="uploading">
+        <span x-show="!recording">{% include "components/_icon.html" with name="mic" size=16 %}</span>
+        <span x-show="recording" x-cloak>{% include "components/_icon.html" with name="stop" size=16 %}</span>
+      </button>
+    </template>
+
+  </div>
+
+  <template x-if="error">
+    <div class="alert" x-cloak x-text="error"></div>
+  </template>
+
+</div>
+
+<script>
+  const log = document.getElementById("log");
+  const pending = document.getElementById("pending");
+  const streamUrl = "{% url 'knowledge:conversation_stream' conversation.pk %}";
+  let source = null;
+
+  const scroll = () => log.scrollTo({ top: log.scrollHeight, behavior: "smooth" });
+
+  function bubble(state) {
+    pending.innerHTML =
+      '<div class="msg msg--assistant"><div class="msg__body" id="live">' +
+      (state === "thinking" ? '<span class="spinner"></span>' : "") +
+      "</div></div>";
+    return document.getElementById("live");
+  }
+
+  function startTurn() {
+    if (source) source.close();
+    let live = bubble("thinking");
+    let text = "";
+
+    source = new EventSource(streamUrl);
+    source.addEventListener("typing", () => { live.innerHTML = ""; });
+    source.addEventListener("token", (e) => {
+      text += e.data;
+      live.textContent = text;
+      scroll();
+    });
+    source.addEventListener("settled", (e) => {
+      pending.insertAdjacentHTML("beforebegin", e.data);
+      pending.innerHTML = "";
+      scroll();
+    });
+    source.addEventListener("closing", (e) => {
+      if (e.data.trim()) document.getElementById("finish-form").style.display = "";
+    });
+    source.addEventListener("done", () => { source.close(); source = null; });
+    source.onerror = () => { source.close(); source = null; };
+    scroll();
+  }
+
+  {% if awaiting %}startTurn();{% endif %}
+  scroll();
+</script>
+{% endblock %}

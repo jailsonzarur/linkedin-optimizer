@@ -3,8 +3,9 @@ import logging
 from celery import shared_task
 from django.db import transaction
 
-from knowledge.models import Conversation, ProfileImport
+from knowledge.models import Conversation, Message, ProfileImport
 from knowledge.services.events import publish
+from knowledge.services.conversation import opening_question
 from knowledge.services.judge import ProfileJudge
 from knowledge.services.pdf import ExtractionError, extract_text
 
@@ -74,6 +75,16 @@ def judge_import(import_id):
             profile_import=profile_import,
             record=record,
         )
+
+    try:
+        Message.objects.create(
+            conversation=conversation,
+            role=Message.Role.ASSISTANT,
+            content=opening_question(record),
+            status=Message.Status.DONE,
+        )
+    except Exception:
+        logger.exception("Could not generate the opening question for %s", conversation.pk)
 
     publish(import_id, "conversation.ready", conversation.pk)
     publish(import_id, "done", conversation.pk)

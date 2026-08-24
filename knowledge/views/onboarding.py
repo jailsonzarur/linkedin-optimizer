@@ -13,8 +13,15 @@ def onboarding_done(user):
     return user.conversations.filter(status="completed").exists()
 
 
+def current_import(user):
+    return ProfileImport.objects.filter(user=user).first()
+
+
 @login_required
 def onboarding_start(request):
+    existing = current_import(request.user)
+    if existing and existing.status != ProfileImport.Status.FAILED:
+        return redirect("knowledge:onboarding_progress", pk=existing.pk)
     return render(request, "knowledge/onboarding_start.html")
 
 
@@ -45,6 +52,7 @@ def onboarding_create(request):
     if errors:
         return render(request, "knowledge/onboarding_start.html", {"errors": errors}, status=400)
 
+    ProfileImport.objects.filter(user=request.user).delete()
     profile_import = ProfileImport.objects.create(
         user=request.user, linkedin_pdf=linkedin_pdf, resume=resume or None
     )
@@ -64,6 +72,7 @@ def onboarding_progress(request, pk):
 def onboarding_result(request, pk):
     profile_import = get_object_or_404(ProfileImport, pk=pk, user=request.user)
     record = profile_import.judgment or {}
+    conversation = profile_import.conversations.first()
     sections = [
         {"name": name, "data": record.get(name) or {}}
         for name in ("headline", "about", "skills")
@@ -72,6 +81,7 @@ def onboarding_result(request, pk):
     total += sum(len(s["data"].get("judgments") or []) for s in sections)
     return render(request, "knowledge/onboarding_result.html", {
         "import": profile_import,
+        "conversation": conversation,
         "experiences": record.get("experiences") or [],
         "sections": sections,
         "unbacked": [k for k, v in ((record.get("skills") or {}).get("backed_by") or {}).items() if not v],
@@ -80,13 +90,17 @@ def onboarding_result(request, pk):
 
 
 @login_required
-def import_list(request):
-    imports = ProfileImport.objects.filter(user=request.user).prefetch_related("conversations")
-    return render(request, "knowledge/import_list.html", {"imports": imports})
+def import_detail(request):
+    existing = current_import(request.user)
+    if not existing:
+        return redirect("knowledge:onboarding_start")
+    if existing.status != ProfileImport.Status.READY:
+        return redirect("knowledge:onboarding_progress", pk=existing.pk)
+    return redirect("knowledge:onboarding_result", pk=existing.pk)
 
 
 @login_required
 @require_POST
 def import_clear(request):
     ProfileImport.objects.filter(user=request.user).delete()
-    return redirect("knowledge:import_list")
+    return redirect("knowledge:onboarding_start")

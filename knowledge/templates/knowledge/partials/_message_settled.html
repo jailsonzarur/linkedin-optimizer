@@ -1,0 +1,4 @@
+<div class="msg msg--user" id="msg-{{ message.pk }}" hx-on::load="startTurn()">
+  <div class="msg__body">{{ message.content }}</div>
+</div>
+<script>startTurn();</script>

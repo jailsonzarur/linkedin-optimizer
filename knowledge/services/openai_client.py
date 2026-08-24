@@ -1,12 +1,20 @@
 from django.conf import settings
-from openai import OpenAI
+from openai import AsyncOpenAI, OpenAI
 
 
 class MissingCredentials(RuntimeError):
     pass
 
 
-def get_client():
+def _key():
     if not settings.OPENAI_API_KEY:
         raise MissingCredentials("OPENAI_API_KEY is not set.")
-    return OpenAI(api_key=settings.OPENAI_API_KEY)
+    return settings.OPENAI_API_KEY
+
+
+def get_client():
+    return OpenAI(api_key=_key())
+
+
+def get_async_client():
+    return AsyncOpenAI(api_key=_key())
