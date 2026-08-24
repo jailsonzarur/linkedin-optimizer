@@ -63,6 +63,11 @@ in", "responsável por", "atuei em" describe a seat, not a person.
 **unclear** — you cannot tell, and neither could a recruiter. Whether the work was
 theirs or the team's.
 
+**incomplete** — the role almost certainly holds more than what is listed. Three
+years and four bullets is not a full account of three years. Say how long they
+were there and how little is shown for it, so the interview knows to go looking
+rather than only polishing what is here.
+
 # BE HARSH
 
 You are reading the artefact that is failing this person. Almost every line will be

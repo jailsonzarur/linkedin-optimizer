@@ -19,6 +19,10 @@ plausible it looks next to the rest.
 Write in the language you are told to write in. A profile that switches
 languages between one role and the next reads as careless, and that is what
 happens when each section decides for itself.
+
+Job titles are the exception, always. They are written the way the market
+searches for them — in technology that means English, whatever language
+surrounds them.
 """.strip()
 
 
@@ -26,30 +30,63 @@ HEADLINE_PROMPT = (
     """
 You write LinkedIn headlines.
 
-A headline does two jobs at once, and they pull against each other.
+# THE HEADLINE IS A SEARCH FIELD
 
-It has to be FOUND. LinkedIn matches recruiters to people through standardised
-titles and skills. A title nobody searches for makes the person invisible no
-matter how good they are — "Ninja do Código" matches nothing, and so does
-"Analista de Sistemas III", which is real but means nothing outside the company
-that invented it. So the headline opens with the market title for what they
-actually do.
+Recruiters find people two ways at once, and both run against this field.
 
-It has to be READ. Recruiters scan for a few seconds. After the title, what earns
-attention is the stack they work in and the thing they are good at — concrete
-enough that it could not describe just anyone.
+They filter and run boolean searches — `React AND TypeScript`, `Python AND AWS`.
+If a term is not written here, that search does not return this person. Not lower
+down the list: not at all.
 
-The shape that does both:
+And LinkedIn matches semantically, weighting the title heavily. So the title has
+to be the one the market uses.
 
-    Market Title · core technologies · what they are known for
+Both of those reward density. You have 220 characters and every real, distinct
+term in them is another way to be found. A short elegant headline is a headline
+with fewer doors into it.
 
-Some things do not belong: how they feel about their work, "apaixonado por",
-"em busca de novos desafios", emoji, and any claim the record does not support.
+# WHAT THIS MEANS IN PRACTICE
 
-Return three, most conventional first, most distinctive last. They differ in
-emphasis, not in wording:
+**The job title is written the way the market searches for it.** In technology
+that is almost always English, including in Brazil — recruiters there search
+"Backend Engineer" and "AI Engineer", not the translation. Never translate the
+title, whatever language the rest of the profile is in. An internal title like
+"Analista de Sistemas III" is replaced by the market equivalent.
 
-{"variants": ["", "", ""]}
+**Credentials that are themselves searched for stay.** "AWS Certified", "ICPC
+Silver Medalist", "PhD" are both a filter term and a differentiator. Dropping
+them costs twice.
+
+**Every distinct technology they actually work in earns its place.** Python,
+Django, FastAPI, TypeScript, React, LangGraph, RAG, Kubernetes — these are not
+clutter, they are the search surface.
+
+**Use the space.** A headline of 90 characters has thrown away more than half of
+the most heavily weighted field on the profile.
+
+# WHAT DOES NOT BELONG
+
+Repeating the same idea in different words. How they feel about their work —
+"apaixonado por tecnologia", "results-driven", "em busca de novos desafios".
+Emoji. Anything the record does not support.
+
+That is the real line: cut repetition and cut empty adjectives. Do not cut real
+terms to make it look tidier.
+
+# IF THE CURRENT HEADLINE IS ALREADY GOOD
+
+Say so, and improve at the margin. A headline that already leads with a market
+title and carries a dozen real terms does not need rewriting — it might need a
+term added, an empty phrase removed, or the order changed so the strongest
+signal comes first. Replacing something good with something shorter is a loss,
+and you are not here to leave your mark.
+
+# RETURN
+
+Three headlines, each under 220 characters. They differ in what they lead with
+after the title, not in how much they keep.
+
+{"variants": ["", "", ""], "verdict": "one line on how the current one is doing"}
 
 Return only the JSON object.
 """
@@ -92,28 +129,53 @@ EXPERIENCE_PROMPT = (
     """
 You rewrite the description of one role.
 
-You are given what the profile says today, and what the person said about it when
-someone actually asked. The second one is where the material is.
+You are given what the profile says today, already split into the bullets it is
+written as, and what the person said about that role when someone asked.
 
-The failure you are correcting: descriptions of a seat rather than a person.
-"Responsável pelo desenvolvimento de APIs" is true of everyone who ever held that
-job. It gives a recruiter nothing to choose you by.
+# KEEP THE SHAPE
 
-So each line answers: what changed because they were the one doing it. Where the
-record has a number, the number goes in. Where it has scale — traffic, users,
+Bullets stay bullets. Someone who wrote six of them wrote six because each one is
+a different piece of work, and collapsing them into one paragraph throws five of
+them away. That is deletion, not editing.
+
+As a rule you come back with at least as many bullets as you were given. Merge two
+only when they genuinely describe the same thing twice.
+
+# THE TWO SOURCES
+
+`bullets` is what is published. Most of it is worth keeping — someone already
+decided each line earned a place. Your work there is to strengthen: add the number
+the conversation revealed, name the scale, make the ownership explicit. If a line
+is already specific and evidenced, leave it close to how it is.
+
+`learned` is what came out of the interview. Some of it maps onto an existing
+bullet. Some of it is work that was never written down anywhere — and that is the
+most valuable thing you have, because it is the part no recruiter has ever seen.
+Those become NEW bullets.
+
+Mark which is which so the person can see what the conversation bought them:
+
+  {"text": "...", "origin": "rewritten"}   built from an existing bullet
+  {"text": "...", "origin": "new"}         from the conversation only
+
+# WHAT MAKES A BULLET WORK
+
+It answers what changed because they were the one doing it. "Responsável pelo
+desenvolvimento de APIs" is true of everyone who held that chair.
+
+Where the record has a number, it goes in. Where it has scale — traffic, users,
 team size, money — that goes in too, because "built an API" reads differently at
 ten users and at ten million.
 
-Start each line with what they did, in the past tense, active, and in the FIRST
-person throughout — "Desenvolvi", "Reduzi", never "Desenvolveu" or "Reduziu".
-Three to five lines. Fewer good ones beats more padded ones.
+First person, past tense, active: "Desenvolvi", "Reduzi" — never "Desenvolveu".
+Name the technologies; they are searched for here as well as in the headline.
 
-If the record genuinely holds nothing beyond the duty, say so honestly by writing
-the duty plainly and briefly. Do not decorate emptiness.
+If the record genuinely holds nothing beyond a duty, write the duty plainly and
+briefly rather than decorating it.
 
-Return:
+# RETURN
 
-{"lines": ["", "", ""]}
+{"bullets": [{"text": "", "origin": "rewritten | new"}]}
 
 Return only the JSON object.
 """

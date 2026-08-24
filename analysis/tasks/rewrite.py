@@ -3,7 +3,7 @@ import logging
 from celery import shared_task
 from django.db import transaction
 
-from analysis.models import Analysis, AnalysisSection
+from analysis.models import Analysis, AnalysisBullet, AnalysisSection
 from analysis.services.rewriter import ProfileRewriter
 from knowledge.services.events import publish
 
@@ -47,18 +47,19 @@ def analyse_profile(analysis_id):
                 suggested_text=text,
             ))
 
-        for experience, lines in rewriter.experiences():
-            rows += [
+        experience_rows = []
+        for experience, originals, suggested in rewriter.experiences():
+            experience_rows.append((
                 AnalysisSection(
                     analysis=analysis,
                     section=AnalysisSection.Section.EXPERIENCE_BULLET,
                     source_ref=experience.get("id", ""),
                     original_text=experience.get("content", ""),
-                    suggested_text=line,
-                    variant_index=index,
-                )
-                for index, line in enumerate(lines)
-            ]
+                    suggested_text="",
+                ),
+                originals,
+                suggested,
+            ))
 
         overall, per_section = rewriter.scores()
     except Exception:
@@ -71,6 +72,25 @@ def analyse_profile(analysis_id):
     with transaction.atomic():
         analysis.sections.all().delete()
         AnalysisSection.objects.bulk_create(rows)
+
+        bullets = []
+        for section, originals, suggested in experience_rows:
+            section.save()
+            bullets += [
+                AnalysisBullet(section=section, kind=AnalysisBullet.Kind.ORIGINAL,
+                               position=index, text=text)
+                for index, text in enumerate(originals)
+            ]
+            bullets += [
+                AnalysisBullet(
+                    section=section,
+                    kind=AnalysisBullet.Kind.SUGGESTED,
+                    position=index,
+                    text=item["text"] if item.get("origin") != "new" else f"[new] {item['text']}",
+                )
+                for index, item in enumerate(suggested)
+            ]
+        AnalysisBullet.objects.bulk_create(bullets)
         analysis.overall_score = overall
         analysis.overall_score_per_section = per_section
         analysis.status = Analysis.Status.DONE

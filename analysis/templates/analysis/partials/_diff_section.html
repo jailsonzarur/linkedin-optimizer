@@ -3,7 +3,9 @@
   <div class="section-head">
     <h2 class="t-lg">{{ group.label }}</h2>
     {% if group.changed_count %}
-      {% if group.total > 1 %}
+      {% if group.bullets %}
+        {% include "components/_pill.html" with text=group.changed_summary tone="accent" %}
+      {% elif group.total > 1 %}
         {% include "components/_pill.html" with text=group.changed_summary tone=group.tone %}
       {% else %}
         {% include "components/_pill.html" with text="rewritten" tone=group.tone %}
@@ -14,6 +16,10 @@
       <span class="t-xs dim">{{ group.alternates }} alternative{{ group.alternates|pluralize }}</span>
     {% endif %}
   </div>
+
+  {% if group.bullets %}
+    {% include "analysis/partials/_bullet_panes.html" with group=group %}
+  {% endif %}
 
   {% for row in group.rows %}
     <div class="panes"{% if not row.changed %} x-show="!onlyChanges" x-cloak{% endif %}>

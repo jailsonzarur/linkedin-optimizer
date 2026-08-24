@@ -43,3 +43,20 @@ class AnalysisSection(models.Model):
 
     def __str__(self):
         return f"{self.get_section_display()} (variant {self.variant_index})"
+
+
+class AnalysisBullet(models.Model):
+    class Kind(models.TextChoices):
+        ORIGINAL = "original", "Original"
+        SUGGESTED = "suggested", "Suggested"
+
+    section = models.ForeignKey(AnalysisSection, on_delete=models.CASCADE, related_name="bullets")
+    kind = models.CharField(max_length=20, choices=Kind.choices)
+    position = models.PositiveSmallIntegerField(default=0)
+    text = models.TextField()
+
+    class Meta:
+        ordering = ["section", "kind", "position"]
+
+    def __str__(self):
+        return f"{self.get_kind_display()}: {self.text[:50]}"

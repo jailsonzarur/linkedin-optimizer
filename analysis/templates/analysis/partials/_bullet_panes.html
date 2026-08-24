@@ -1,0 +1,24 @@
+<div class="panes">
+  <div class="diff-block diff-block--current stack gap-2">
+    {% for bullet in group.bullets.original %}
+      <div class="row gap-2" style="align-items: flex-start;">
+        <span class="dim">•</span><span>{{ bullet.text }}</span>
+      </div>
+    {% empty %}
+      <span class="dim">Nothing on the profile for this role.</span>
+    {% endfor %}
+  </div>
+
+  <div class="diff-block diff-block--optimized stack gap-2">
+    {% for bullet in group.bullets.suggested %}
+      <div class="row gap-2" style="align-items: flex-start;">
+        {% if bullet.is_new %}
+          <span class="t-accent" title="Came out of the conversation">✦</span>
+        {% else %}
+          <span class="dim">•</span>
+        {% endif %}
+        <span>{{ bullet.text }}</span>
+      </div>
+    {% endfor %}
+  </div>
+</div>

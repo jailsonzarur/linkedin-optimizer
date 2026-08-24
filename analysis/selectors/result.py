@@ -1,4 +1,4 @@
-from analysis.models import Analysis, AnalysisSection
+from analysis.models import Analysis, AnalysisBullet, AnalysisSection
 from analysis.services.diffing import InlineDiffer
 from analysis.services.scoring import ScorePalette
 
@@ -19,7 +19,7 @@ class AnalysisResultSelector:
     def for_user(cls, user, pk):
         analysis = (
             Analysis.objects.select_related("user")
-            .prefetch_related("sections")
+            .prefetch_related("sections__bullets")
             .get(pk=pk, user=user)
         )
         return cls(analysis)
@@ -42,26 +42,71 @@ class AnalysisResultSelector:
     def groups(self):
         groups = []
         for key, label in self.SECTION_ORDER:
+            if key == AnalysisSection.Section.EXPERIENCE_BULLET:
+                groups += self._experience_groups()
+                continue
+
             rows = self._rows_for(key)
             if not rows:
                 continue
 
             changed_count = sum(1 for row in rows if row["changed"])
-            groups.append(
-                {
-                    "key": key,
-                    "label": label,
-                    "rows": rows,
-                    "changed_count": changed_count,
-                    "changed_summary": f"{changed_count} of {len(rows)} changed",
-                    "total": len(rows),
-                    "alternates": self._alternates_for(key),
-                    "tone": ScorePalette.tone(
-                        self.analysis.overall_score_per_section.get(key)
-                    ),
-                }
-            )
+            groups.append({
+                "key": key,
+                "label": label,
+                "rows": rows,
+                "bullets": None,
+                "changed_count": changed_count,
+                "changed_summary": f"{changed_count} of {len(rows)} changed",
+                "total": len(rows),
+                "alternates": self._alternates_for(key),
+                "tone": ScorePalette.tone(self.analysis.overall_score_per_section.get(key)),
+            })
         return groups
+
+    def _experience_groups(self):
+        groups = []
+        for section in self.sections:
+            if section.section != AnalysisSection.Section.EXPERIENCE_BULLET:
+                continue
+
+            bullets = list(section.bullets.all())
+            originals = [b for b in bullets if b.kind == AnalysisBullet.Kind.ORIGINAL]
+            suggested = [b for b in bullets if b.kind == AnalysisBullet.Kind.SUGGESTED]
+            if not originals and not suggested:
+                continue
+
+            rendered = []
+            for bullet in suggested:
+                text = bullet.text
+                is_new = text.startswith("[new] ")
+                rendered.append({"text": text.removeprefix("[new] "), "is_new": is_new})
+
+            groups.append({
+                "key": f"{AnalysisSection.Section.EXPERIENCE_BULLET}:{section.source_ref}",
+                "label": self._experience_label(section.source_ref),
+                "rows": None,
+                "bullets": {"original": originals, "suggested": rendered},
+                "changed_count": sum(1 for b in rendered if b["is_new"]),
+                "changed_summary": f"{sum(1 for b in rendered if b['is_new'])} new",
+                "total": len(rendered),
+                "alternates": 0,
+                "tone": ScorePalette.tone(
+                    self.analysis.overall_score_per_section.get("experience_bullet")
+                ),
+            })
+        return groups
+
+    def _experience_label(self, source_ref):
+        record = (self.analysis.profile_import.conversations.first() or None)
+        experiences = ((record.record if record else self.analysis.profile_import.judgment)
+                       or {}).get("experiences") or []
+        for experience in experiences:
+            if experience.get("id") == source_ref:
+                company = experience.get("company") or ""
+                title = experience.get("title") or ""
+                return f"{company} · {title}".strip(" ·") or "Experience"
+        return "Experience"
 
     def section_scores(self):
         per_section = self.analysis.overall_score_per_section

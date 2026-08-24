@@ -75,13 +75,32 @@ class ProfileRewriter:
         })
         return section.get("current", ""), result.get("text", "")
 
+    @staticmethod
+    def split_bullets(content):
+        if not content:
+            return []
+        text = content.replace("\u2022", "\n").replace(" - ", "\n")
+        lines = [line.strip(" -*\u2022\t") for line in text.splitlines()]
+        return [line for line in lines if len(line) > 12]
+
     def experiences(self):
         experiences = self._experiences()
         for index, experience in enumerate(experiences, start=1):
             label = f"{index}/{len(experiences)}|{experience.get('company', '')}"
             self.on_event("analysis.experience", label)
-            result = self._ask(EXPERIENCE_PROMPT, {"experience": experience})
-            yield experience, result.get("lines") or []
+            originals = self.split_bullets(experience.get("content", ""))
+            result = self._ask(EXPERIENCE_PROMPT, {
+                "title": experience.get("title"),
+                "company": experience.get("company"),
+                "bullets": originals,
+                "learned": experience.get("learned") or [],
+                "judgments": experience.get("judgments") or [],
+            })
+            suggested = [
+                b for b in (result.get("bullets") or [])
+                if isinstance(b, dict) and b.get("text")
+            ]
+            yield experience, originals, suggested
 
     def scores(self):
         self.on_event("analysis.scoring", "")
