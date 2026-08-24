@@ -110,6 +110,9 @@
     source.addEventListener("closing", (e) => {
       if (e.data.trim()) document.getElementById("finish-form").style.display = "";
     });
+    source.addEventListener("finalised", (e) => {
+      window.location = "/analysis/" + e.data.trim() + "/running/";
+    });
     source.addEventListener("done", () => { source.close(); source = null; });
     source.onerror = () => { source.close(); source = null; };
     scroll();

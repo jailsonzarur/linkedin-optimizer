@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST
 
 from knowledge.models import Conversation, Message
 from knowledge.services.conversation import CLOSING_MARKER, extract, split_closing, stream_question
+from knowledge.services.finalise import finalise
 from knowledge.tasks import transcribe_message
 
 
@@ -70,6 +71,13 @@ async def conversation_stream(request, pk):
         yield _frame("thinking", "")
         conversation.record = await extract(conversation.record, messages)
         await conversation.asave(update_fields=["record", "updated_at"])
+
+        confirmed = (conversation.record.get("closing") or {}).get("user_confirmed")
+        if confirmed and len(messages) > 2:
+            analysis = await sync_to_async(finalise)(conversation)
+            yield _frame("finalised", str(analysis.pk))
+            yield _frame("done", "")
+            return
 
         yield _frame("typing", "")
 
@@ -137,6 +145,5 @@ def message_status(request, pk):
 @require_POST
 def conversation_finish(request, pk):
     conversation = get_object_or_404(Conversation, pk=pk, user=request.user)
-    conversation.status = Conversation.Status.COMPLETED
-    conversation.save(update_fields=["status", "updated_at"])
-    return redirect("accounts:home")
+    analysis = finalise(conversation)
+    return redirect("analysis:running", pk=analysis.pk)

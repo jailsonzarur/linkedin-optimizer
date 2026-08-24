@@ -126,6 +126,7 @@ CELERY_TASK_REJECT_ON_WORKER_LOST = True
 CELERY_TASK_DEFAULT_QUEUE = "default"
 CELERY_TASK_ROUTES = {
     "knowledge.tasks.*": {"queue": "knowledge"},
+    "analysis.tasks.*": {"queue": "knowledge"},
 }
 
 # --- OpenAI ---

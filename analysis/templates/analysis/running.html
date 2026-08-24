@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Rewriting your profile · LinkedIn Optimizer{% endblock %}
+{% block chrome %}{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/htmx-ext-sse@2.2.4" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="auth">
+  <div class="auth__card" style="max-width: 460px;">
+
+    <div class="auth__brand">
+      {% include "components/_logo.html" %}
+      <span>LinkedIn Optimizer</span>
+    </div>
+
+    <div class="card" hx-ext="sse" sse-connect="{% url 'analysis:stream' analysis.pk %}">
+      <div class="card__body stack gap-5">
+        <div sse-swap="step">
+          {% include "knowledge/partials/_stream_step.html" with label="Getting started" detail="" name="analysis.started" %}
+        </div>
+        <ul class="stack gap-2 t-sm muted" sse-swap="log" hx-swap="beforeend"></ul>
+        <div sse-swap="done" sse-close="done" style="display:none"></div>
+        <div sse-swap="failed" sse-close="failed" style="display:none"></div>
+      </div>
+    </div>
+
+    <p class="auth__foot">Writing takes a minute. You can leave — we will keep going.</p>
+
+  </div>
+</div>
+
+<script>
+  document.body.addEventListener("htmx:sseMessage", (event) => {
+    if (event.detail.type === "done") {
+      window.location = "{% url 'analysis:result' analysis.pk %}";
+    }
+  });
+</script>
+{% endblock %}

@@ -24,8 +24,14 @@ It starts as the judgement of their existing profile and grows as they talk.
   "headline": {"current": "", "judgments": [], "learned": []},
   "about": {"current": "", "judgments": [], "learned": []},
   "skills": {"current": [], "backed_by": {}, "judgments": [], "learned": []},
-  "target": {"role": "", "work_mode": "", "notes": ""}
+  "target": {"role": "", "work_mode": "", "notes": ""},
+  "closing": {"user_confirmed": false}
 }
+
+Set `closing.user_confirmed` to true only when the interviewer has asked whether
+anything is missing and the person has answered that there is nothing more. A
+short answer is not agreement, and neither is silence about one topic while they
+are still talking about another. If they add anything at all, it stays false.
 
 `content` is what they wrote before. `learned` is what they told a person. Keep them
 apart — the rewrite later needs to show the difference.

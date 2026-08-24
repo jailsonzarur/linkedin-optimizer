@@ -33,12 +33,13 @@ class AnalysisSection(models.Model):
 
     analysis = models.ForeignKey(Analysis, on_delete=models.CASCADE, related_name="sections")
     section = models.CharField(max_length=30, choices=Section.choices)
+    source_ref = models.CharField(max_length=40, blank=True)
     original_text = models.TextField()
     suggested_text = models.TextField()
     variant_index = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
-        ordering = ["analysis", "section", "variant_index"]
+        ordering = ["analysis", "section", "source_ref", "variant_index"]
 
     def __str__(self):
         return f"{self.get_section_display()} (variant {self.variant_index})"
