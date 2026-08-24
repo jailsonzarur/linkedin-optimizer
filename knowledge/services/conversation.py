@@ -40,6 +40,8 @@ async def extract(record, messages):
     response = await client.chat.completions.create(
         model=settings.OPENAI_EXTRACTION_MODEL,
         response_format={"type": "json_object"},
+        temperature=0,
+        seed=11,
         messages=[
             {"role": "system", "content": EXTRACTOR_SYSTEM_PROMPT},
             {

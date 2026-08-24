@@ -11,6 +11,8 @@ from knowledge.services.openai_client import get_client
 
 
 class ProfileJudge:
+    SEED = 11
+
 
     def __init__(self, client=None, model=None, on_event=None):
         self._client = client
@@ -27,6 +29,8 @@ class ProfileJudge:
         response = self.client.chat.completions.create(
             model=self.model,
             response_format={"type": "json_object"},
+            temperature=0,
+            seed=self.SEED,
             messages=[{"role": "system", "content": system},
                       {"role": "user", "content": user}],
         )
@@ -58,7 +62,14 @@ class ProfileJudge:
                 f"FULL PROFILE:\n{raw_text}\n\nJUDGE THIS EXPERIENCE:\n"
                 f"{json.dumps(experience, ensure_ascii=False)}",
             )
-            experience["judgments"] = verdict.get("judgments") or []
+            experience["judgments"] = [
+                {"kind": check.get("kind") or "weak",
+                 "note": check.get("note", ""),
+                 "quote": check.get("quote", ""),
+                 "check": check.get("id", "")}
+                for check in verdict.get("checks") or []
+                if check.get("verdict") == "fail"
+            ]
             experience["learned"] = []
 
         self.on_event("judge.sections", "")
@@ -68,14 +79,27 @@ class ProfileJudge:
             f"{json.dumps(parsed, ensure_ascii=False)}",
         )
 
+        failed = [c for c in sections.get("checks") or [] if c.get("verdict") == "fail"]
+
+        def judgments_for(prefix):
+            return [
+                {"kind": c.get("kind") or "weak", "note": c.get("note", ""),
+                 "quote": c.get("quote", ""), "check": c.get("id", "")}
+                for c in failed
+                if str(c.get("id", "")).startswith(prefix)
+            ]
+
         record = {
             "experiences": experiences,
-            "headline": {**(parsed.get("headline") or {}), **(sections.get("headline") or {}), "learned": []},
-            "about": {**(parsed.get("about") or {}), **(sections.get("about") or {}), "learned": []},
-            "skills": {**(parsed.get("skills") or {}), **(sections.get("skills") or {}), "learned": []},
+            "headline": {**(parsed.get("headline") or {}),
+                         "judgments": judgments_for("headline"), "learned": []},
+            "about": {**(parsed.get("about") or {}),
+                      "judgments": judgments_for("about"), "learned": []},
+            "skills": {**(parsed.get("skills") or {}),
+                       "backed_by": sections.get("backed_by") or {},
+                       "judgments": judgments_for("skills"), "learned": []},
             "target": {"role": "", "work_mode": "", "notes": ""},
         }
-        total = sum(len(e.get("judgments") or []) for e in experiences)
-        total += sum(len((record[s].get("judgments") or [])) for s in ("headline", "about", "skills"))
+        total = sum(len(e.get("judgments") or []) for e in experiences) + len(failed)
         self.on_event("judge.done", total)
         return record

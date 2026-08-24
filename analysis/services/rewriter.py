@@ -12,6 +12,9 @@ from knowledge.services.openai_client import get_client
 
 
 class ProfileRewriter:
+    SEED = 11
+    WRITING_TEMPERATURE = 0.4
+
     def __init__(self, record, client=None, model=None, on_event=None):
         self.record = record or {}
         self._client = client
@@ -31,10 +34,12 @@ class ProfileRewriter:
                     return "Portuguese"
         return "English"
 
-    def _ask(self, system, payload):
+    def _ask(self, system, payload, temperature=None):
         response = self.client.chat.completions.create(
             model=self.model,
             response_format={"type": "json_object"},
+            temperature=self.WRITING_TEMPERATURE if temperature is None else temperature,
+            seed=self.SEED,
             messages=[
                 {"role": "system", "content": system},
                 {"role": "system", "content": f"Write everything in {self._language()}."},
@@ -61,7 +66,7 @@ class ProfileRewriter:
             "experiences": self._experiences(),
             "skills": self._section("skills"),
             "target": self.record.get("target") or {},
-        })
+        }, temperature=0.7)
         return section.get("current", ""), (result.get("variants") or [])[:3]
 
     def about(self):
@@ -119,6 +124,6 @@ class ProfileRewriter:
                 {"title": e.get("title"), "company": e.get("company"), "content": e.get("content")}
                 for e in self._experiences()
             ],
-        })
+        }, temperature=0)
         sections = result.get("sections") or {}
         return result.get("overall"), {k: v for k, v in sections.items() if isinstance(v, int)}
